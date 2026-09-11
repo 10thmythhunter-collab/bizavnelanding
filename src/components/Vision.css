@@ -1,0 +1,247 @@
+/* Node 215:21286 — a 1237px group: a 297-wide photo card overlapping the left
+   edge of a 986x579 quote panel. Fluid values land on the design's own
+   numbers at 1440px and scale from there rather than stepping at
+   breakpoints. */
+
+.vision {
+  padding-block: clamp(3rem, 6.11vw, 5.75rem);
+  /* The design's own 101px inset either side of the 1237 group. */
+  padding-inline: clamp(1.5rem, 7.08vw, 6.375rem);
+  background-color: #ffffff;
+}
+
+/* --- header --- */
+
+.vision__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.vision__eyebrow {
+  margin: 0;
+  font-weight: 400;
+  /* The design's own 10px here, the same size Products and Aira's eyebrows
+     already run at. */
+  font-size: 0.625rem;
+  line-height: normal;
+  letter-spacing: 0.1em;
+  color: #0a0a0a;
+}
+
+.vision__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
+
+/* --- the overlap --- */
+
+/* The design's own 251/986/297 out of a 1237 whole, kept as percentages of
+   this box so the overlap holds at any width — a card's left/top as a
+   percentage resolves against this container's box, which is exactly what
+   ties the two together as the group scales. */
+.vision__group {
+  position: relative;
+  margin: clamp(1.5rem, 2.15vw, 1.9375rem) auto 0;
+  max-width: 1237px;
+}
+
+.vision__panel {
+  position: relative;
+  /* 251 / 1237 — and the rest of the margin zeroed, because a figure
+     carries margin: 1em 40px from the UA stylesheet, which would otherwise
+     take 40px off each side of this panel. */
+  margin: 0 0 0 20.29%;
+  /* 986 / 1237. */
+  width: 79.71%;
+  /* No overflow: hidden. The card below lives inside this figure — it has
+     to, to be able to sit on the photograph on narrow screens — and on wide
+     ones it reaches out past this box's left edge to where the design puts
+     it. Nothing else here needs clipping: the photograph's own box is
+     exactly this box, and object-fit crops inside it. */
+  background-color: #d9d9d9;
+}
+
+.vision__panel-bg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vision__panel-veil {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* No aspect-ratio on the panel, and the design's 579 height is not lost by
+   leaving it out: the padding below is the design's own 170 top and bottom as
+   a share of the panel's own 986 width, so 170 + the text's 239 + 170 comes
+   to that 579 at the design's own size. The difference is what happens as the
+   panel narrows — the text needs more height while a ratio would hand it
+   less, which put 15-54px of it past the panel between 900 and 760, and some
+   240px at 390, with overflow: hidden taking the difference off the bottom.
+   Height from the content cannot clip the content.
+
+   The insets are percentages for the same reason: they resolve against this
+   box's own width, so they hold their proportion instead of drifting out of
+   step with the box they are padding the way viewport-based values did. */
+.vision__quote {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* 57px at the design's 579-tall panel. */
+  gap: clamp(2.5rem, 3.96vw, 3.5625rem);
+  /* The design's own measure, which is what puts the line breaks where
+     they are. */
+  max-width: 817px;
+  margin: 0;
+  padding: 17.24% 5.78% 17.24% 11.36%;
+  font-weight: 400;
+  font-size: clamp(1.125rem, 1.39vw, 1.25rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+}
+
+.vision__quote p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* The card overlapping the panel's left edge — the design's 297-wide box at
+   the group's own left edge, which from inside the panel is 251 of the
+   panel's 986 back to the left (25.46%) and 297 of that 986 wide (30.12%).
+   40 / 579 down, as a percentage of the panel's height. */
+.vision__card {
+  position: absolute;
+  left: -25.46%;
+  top: 6.91%;
+  width: 30.12%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.vision__portrait {
+  display: block;
+  width: 100%;
+  /* The design's own 297x414. */
+  aspect-ratio: 297 / 414;
+  object-fit: cover;
+  background-color: #d9d9d9;
+}
+
+.vision__byline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* No nowrap on these: the card is a share of the page, and at the widths
+   where it is narrower than the line, nowrap hid the overflow under the
+   panel instead of wrapping it. */
+.vision__name,
+.vision__role {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
+
+/* The design's own 111x23, at the file's own size: it is a small bitmap, and
+   any upscaling shows as a soft edge. The ratio is stated because the file
+   loads lazily — left to the file, the box is zero until the bytes land and
+   the byline above it shifts when they do. object-fit: contain means a mark
+   of some other shape would letterbox here rather than stretch. */
+.vision__signature {
+  display: block;
+  width: 111px;
+  max-width: 100%;
+  aspect-ratio: 111 / 23;
+  object-fit: contain;
+  object-position: left;
+}
+
+/* --- responsive --- */
+
+/* 950 is where the card stops being able to hold its own byline: the card is
+   24.01% of a group that is itself the viewport less 14.16%, so it runs about
+   0.206 of the window — and "Founder & CEO of bizav.ai" needs some 195px,
+   which is 0.206 of 950. Below that the name and the signature would sit
+   under the dark panel rather than on the card. */
+@media (max-width: 950px) {
+  .vision__panel {
+    position: relative;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* Percentages of a 342px panel would be a hairline of padding; down here
+     the quote takes plain room instead. */
+  .vision__quote {
+    padding: 2rem 1.5rem 1.25rem;
+  }
+
+  /* The card stops being a card and becomes what it is at this width: the
+     caption under the quote, on the photograph rather than beside it. A row,
+     because a 297-wide portrait stacked here would be 414 tall. */
+  .vision__card {
+    /* relative, not static: the photograph and the veil above are both
+       absolutely positioned, and positioned boxes paint after every plain
+       static one in the same stacking context — so a static card here went
+       under the photograph. Only the signature survived it, and only
+       because its own filter promoted it into a context of its own. */
+    position: relative;
+    /* The offsets that reach out past the panel on wide screens have to go
+       with the absolute positioning they belong to, or relative keeps
+       applying them and the portrait hangs off the panel's left edge. */
+    left: auto;
+    top: auto;
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1.5rem 2rem;
+  }
+
+  .vision__portrait {
+    width: clamp(5.5rem, 19vw, 7.5rem);
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .vision__byline {
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  /* On the photograph now, not on the page's white. */
+  .vision__name {
+    color: #ffffff;
+  }
+
+  .vision__role {
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  /* Pure black ink on transparent — nothing else in the file — so the invert
+     is exact: it comes out white and keeps its own edges. */
+  .vision__signature {
+    margin-top: 0.375rem;
+    filter: invert(1);
+  }
+}

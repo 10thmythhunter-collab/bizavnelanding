@@ -1,0 +1,284 @@
+/* The brokers bar's demo request. The reference this came from is dark; the
+   panel below is this site's own instead — white ground, #0a0a0a ink,
+   #4b5563 for the quieter copy, the 1px rgba(0,0,0,0.18) hairline the pills
+   already use, and #3b82f6 on focus like every other control here. */
+
+.demo {
+  /* A dialog is display: none until it is shown, and the browser gives it a
+     border, a margin and a max-height of its own. */
+  width: min(100% - 2rem, 34rem);
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background-color: transparent;
+  overflow: visible;
+  animation: demo-in 260ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+/* The blurred overlay the panel sits over. ::backdrop is the dialog's own
+   layer, so nothing has to be stacked against the fixed bar above. */
+.demo::backdrop {
+  background-color: rgba(10, 10, 10, 0.45);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  animation: demo-veil-in 260ms ease;
+}
+
+.demo__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-height: calc(100dvh - 2rem);
+  padding: clamp(1.5rem, 2.78vw, 2.5rem);
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 24px 60px rgba(10, 10, 10, 0.28);
+  overflow-y: auto;
+}
+
+.demo__close {
+  position: absolute;
+  top: clamp(1rem, 1.67vw, 1.5rem);
+  right: clamp(1rem, 1.67vw, 1.5rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  background-color: #ffffff;
+  color: #0a0a0a;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+.demo__close svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.demo__close:hover {
+  background-color: #0a0a0a;
+  color: #ffffff;
+}
+
+/* The same ring every other control here gets, in place of the browser's
+   own — which this button, being first in the panel, is the one most
+   likely to show. */
+.demo__close:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.demo__eyebrow {
+  margin: 0;
+  /* Clear of the close button, which overlaps this line's own row. */
+  padding-right: 3rem;
+  font-weight: 400;
+  font-size: 0.625rem;
+  line-height: normal;
+  letter-spacing: 0.1em;
+  color: #4b5563;
+}
+
+.demo__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 2.22vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  text-wrap: pretty;
+}
+
+.demo__body {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #4b5563;
+  text-wrap: pretty;
+}
+
+/* --- the form --- */
+
+.demo__form,
+.demo__done {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  width: 100%;
+  /* Off the copy above it, which runs at the panel's own rhythm. */
+  margin-top: 0.75rem;
+}
+
+.demo__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  /* Lets the two on one row shrink rather than overflow it. */
+  min-width: 0;
+}
+
+.demo__label {
+  font-weight: 400;
+  font-size: 0.625rem;
+  line-height: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #4b5563;
+}
+
+.demo__input {
+  width: 100%;
+  height: 3rem;
+  padding-inline: 0.875rem;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 8px;
+  background-color: #ffffff;
+  font: inherit;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  transition: border-color 200ms ease;
+}
+
+.demo__input::placeholder {
+  color: rgba(10, 10, 10, 0.38);
+}
+
+.demo__input:hover {
+  border-color: rgba(0, 0, 0, 0.32);
+}
+
+.demo__input:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-color: rgba(0, 0, 0, 0.32);
+}
+
+.demo__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+/* The chevron is ours, so the select loses the platform's own. */
+.demo__select {
+  position: relative;
+}
+
+.demo__select .demo__input {
+  padding-right: 2.5rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.demo__chevron {
+  position: absolute;
+  top: 50%;
+  right: 0.875rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  transform: translateY(-50%);
+  color: #4b5563;
+  pointer-events: none;
+}
+
+.demo__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 3rem;
+  margin-top: 0.5rem;
+  padding-inline: 1.5rem;
+  border: 0;
+  border-radius: 999px;
+  background-color: #0a0a0a;
+  font: inherit;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    transform 150ms ease;
+}
+
+.demo__submit:hover {
+  background-color: #262626;
+}
+
+.demo__submit:active {
+  transform: scale(0.99);
+}
+
+.demo__submit:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* --- the receipt --- */
+
+.demo__done-line,
+.demo__done-note {
+  margin: 0;
+}
+
+.demo__done-line {
+  font-weight: 400;
+  font-size: 1.125rem;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
+
+.demo__done-note {
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+@media (max-width: 480px) {
+  /* Two selects on one row leave neither its own label's width. */
+  .demo__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes demo-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@keyframes demo-veil-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo,
+  .demo::backdrop {
+    animation: none;
+  }
+
+  .demo__close,
+  .demo__input,
+  .demo__submit {
+    transition: none;
+  }
+}

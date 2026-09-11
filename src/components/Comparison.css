@@ -1,0 +1,204 @@
+/* Fluid values land on the Figma spec at 1440px (72px above, 76px below,
+   40px title, 18px lead, 1280px column, 40px panel padding) and scale from
+   there instead of stepping at breakpoints. */
+
+.comparison {
+  /* The design's gaps to the section above and the one below, which are
+     genuine air between the two boxes rather than either one's padding. */
+  padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2.75rem, 5.28vw, 4.75rem);
+  /* Only reached below ~1360px — above it the column below is what sets the
+     80px inset the design has. */
+  padding-inline: clamp(1.5rem, 2.78vw, 3.5rem);
+  background-color: #ffffff;
+}
+
+.comparison__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+/* --- header --- */
+
+.comparison__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.comparison__eyebrow {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.625rem;
+  line-height: normal;
+  /* The design's 1px at 10px. In em so it survives a change of size. */
+  letter-spacing: 0.1em;
+  color: #0a0a0a;
+  text-align: center;
+}
+
+.comparison__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.comparison__title span {
+  display: block;
+}
+
+.comparison__lead {
+  margin: 0;
+  /* Where the design's own line break falls: at the design width this wraps
+     after "actually goes" on its own. */
+  max-width: 55rem;
+  font-weight: 400;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  line-height: 1.5556;
+  color: #4b5563;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+/* --- panels --- */
+
+.comparison__panels {
+  display: flex;
+  /* Start, not stretch: the two panels hold their own heights in the design,
+     and the right one is 4px taller because its heading carries a wordmark. */
+  align-items: flex-start;
+  gap: 1.5rem;
+  /* The basis is what decides where they stack: two of them plus the gap
+     need ~728px, so below that the row wraps into a column. */
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.comparison__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex: 1 1 22rem;
+  /* Without this the panel cannot shrink under its content's min-content
+     width, and a long bullet would push the pair wider than the column. */
+  min-width: 0;
+  padding: clamp(1.5rem, 2.78vw, 2.5rem);
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  background-color: #f6f6f7;
+}
+
+/* The one you are being sold sits on white inside a firmer border — the
+   design's only two differences between the panels, besides the copy. */
+.comparison__panel--bizav {
+  border-color: #c9cbd1;
+  background-color: #ffffff;
+}
+
+.comparison__panel-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.comparison__panel-name {
+  /* Flex, because on the right panel the second half of the heading is the
+     wordmark rather than a word. */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.3333;
+  letter-spacing: -0.01em;
+  color: #4b5563;
+}
+
+.comparison__panel--bizav .comparison__panel-name {
+  color: #0a0a0a;
+}
+
+.comparison__panel-logo {
+  display: block;
+  /* 113px in the design. Height stays auto so the aspect comes from the file
+     instead of a second number to keep in sync. */
+  width: 113px;
+  height: auto;
+}
+
+.comparison__panel-note {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.4286;
+  color: #8a8f98;
+}
+
+/* Held one step darker than the left panel's, which the design uses to keep
+   this side reading as the live one. */
+.comparison__panel--bizav .comparison__panel-note {
+  color: #4b5563;
+}
+
+/* --- bullets --- */
+
+.comparison__items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comparison__item {
+  display: flex;
+  /* Start, so the marker stays on the first line of a bullet that wraps
+     rather than drifting to the middle of it. */
+  align-items: flex-start;
+  gap: 1rem;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.4286;
+  color: #4b5563;
+}
+
+.comparison__panel--bizav .comparison__item {
+  color: #0a0a0a;
+}
+
+.comparison__icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* --- responsive --- */
+
+@media (max-width: 560px) {
+  /* Below this the break after the comma stops helping — let the headline
+     wrap on its own and balance the lines that come out. */
+  .comparison__title span {
+    display: inline;
+  }
+
+  .comparison__title {
+    text-wrap: balance;
+  }
+}

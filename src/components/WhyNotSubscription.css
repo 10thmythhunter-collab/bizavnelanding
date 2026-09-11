@@ -1,0 +1,209 @@
+/* Node 205:19561's current content — a 1440x1429 frame: 74px above the
+   copy, 194 of copy, 63 down to the table, 1024 of table, 74 below. Fluid
+   values land on those at 1440px and scale from there rather than stepping
+   at breakpoints. */
+
+.why-not {
+  padding-block: clamp(3rem, 5.14vw, 4.625rem);
+  padding-inline: clamp(1.5rem, 2.78vw, 2.5rem);
+  background-color: #ffffff;
+}
+
+/* --- header --- */
+
+.why-not__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  /* The design's own 912px measure — the same width the Signals section's
+     header runs at. */
+  max-width: 57rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.why-not__eyebrow {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: normal;
+  /* The design's 0.8px at 12px. */
+  letter-spacing: 0.08em;
+  color: #8a8f98;
+}
+
+.why-not__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
+
+.why-not__title span {
+  display: block;
+}
+
+.why-not__body {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(0.9375rem, 1.11vw, 1rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  text-wrap: pretty;
+}
+
+/* --- the table --- */
+
+.why-not__table {
+  position: relative;
+  /* 63px at the design width, between the copy and the table. */
+  margin: clamp(2rem, 4.375vw, 3.9375rem) auto 0;
+  max-width: 1351px;
+  border: 1px solid #eeedee;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* One line down the middle of the whole table, header included, rather than
+   a border on every cell — the design's own "Column Divider", which is what
+   keeps the seam continuous across the row colour change below. */
+.why-not__table::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background-color: #eeedee;
+  pointer-events: none;
+}
+
+.why-not__row {
+  display: flex;
+  align-items: stretch;
+}
+
+.why-not__row + .why-not__row {
+  border-top: 1px solid #eeedee;
+}
+
+.why-not__cell {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.625rem;
+  /* The design's own 30/36 box, which is what gives the row its height —
+     rows run 123px tall at a single-line title and body, growing with
+     whatever wraps past that rather than a fixed figure. Three rows in the
+     design run 27px taller than that on an unwrapped body, which reads as
+     an edit that trimmed the copy without following through on the row —
+     so this takes the shorter, content-driven height instead of repeating
+     the mismatch. */
+  padding: 1.875rem 2.25rem;
+}
+
+.why-not__cell--competitor {
+  background-color: #ffffff;
+}
+
+.why-not__cell--bizav {
+  background-color: #f6f9ff;
+}
+
+/* --- header row --- */
+
+.why-not__row--head .why-not__cell {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5625rem 2.25rem;
+}
+
+.why-not__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  flex-shrink: 0;
+  border-radius: 999px;
+}
+
+.why-not__badge--minus {
+  background-color: #eeedee;
+}
+
+.why-not__badge--plus {
+  background-color: #161616;
+}
+
+.why-not__badge img {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.why-not__col-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #161616;
+}
+
+/* --- row cells --- */
+
+.why-not__row-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.4444;
+}
+
+/* The design's own split: the left column's row titles sit a shade lighter
+   than the right's, which is what gives the bizav.ai side the extra half
+   step of emphasis down the whole table. */
+.why-not__row-title--competitor {
+  color: #2e2e2e;
+}
+
+.why-not__row-title--bizav {
+  color: #161616;
+}
+
+.why-not__row-note {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.6875;
+  color: #6b6b6b;
+}
+
+/* --- responsive --- */
+
+@media (max-width: 720px) {
+  /* Two columns of prose stop being legible side by side well before the
+     table itself would wrap; stacking is the same trade the row-vs-panel
+     sections elsewhere on the page make at this width. */
+  .why-not__row {
+    flex-direction: column;
+  }
+
+  .why-not__row--head .why-not__cell:first-child {
+    border-bottom: 1px solid #eeedee;
+  }
+
+  .why-not__row:not(.why-not__row--head) .why-not__cell:first-child {
+    border-bottom: 1px solid #eeedee;
+  }
+
+  .why-not__table::after {
+    display: none;
+  }
+}

@@ -1,0 +1,773 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Every measurement in the bar below is an em off this — the logo, the
+     CTA, the gaps, the padding, the annotation. Change it and the whole bar
+     resizes in proportion; each ratio is the design's own value over its
+     original 16px, so the relationships are the ones from the design.
+     Stated in rem, so nothing compounds down the tree. */
+  --nav-text: 0.9rem;
+  font-size: var(--nav-text);
+  /* The design's 29px against a 16px item came to an 86px bar, which is a
+     lot of the screen for a row 38px tall. This is the wordmark plus about
+     14px of air on each side — enough that nothing reads as crowded against
+     the edge, and no more. Padding rather than an offset: pinned to the top,
+     an offset would leave a strip of the page showing above the glass.
+     Symmetric, so the row stays centred in it. */
+  padding-block: 1.0625em;
+  /* The one thing that is not proportional: it is the hero's 40px inset,
+     from the same expression, because the wordmark and the headline share a
+     left edge in the design. */
+  padding-inline: clamp(1.5rem, 2.78vw, 3.5rem);
+
+  /* --- over the hero ---
+     Glass from the very top of the page now, not from a scroll threshold:
+     the bar sits on the video the whole way down it. The tint is what white
+     type reads on and the blur is what makes it glass rather than a scrim —
+     0.504 is the value tuned against the footage.
+
+     Custom properties don't transition themselves, but the properties that
+     consume them do: the computed colour changes and each element's own
+     transition carries it. Both blur values below carry the same filter
+     functions in the same order so they interpolate; a mismatched list
+     would swap discretely instead. */
+  --nav-bg: rgba(0, 0, 0, 0.099);
+  /* The open menu's own ground, which cannot be --nav-bg: that tint is
+     tuned for a bar with a row of type on it, and at the top of the page it
+     is transparent outright. A panel of four rows over the hero's own
+     footage needs to be a surface. */
+  /* Nearly opaque on purpose. The bar above carries a backdrop-filter,
+     which makes it a backdrop root — so a blur on the card inside it has
+     nothing to sample (the page it would blur is outside that root) and
+     comes out inert. Without a blur to soften it, a tint thin enough to
+     see the hero through reads as murk over the footage rather than as a
+     surface, so the card is a surface. */
+  --nav-menu-bg: rgba(16, 16, 18, 0.96);
+  /* What a row under the pointer takes, and the lift that separates the
+     card from whatever is behind it. */
+  --nav-menu-hover: rgba(255, 255, 255, 0.12);
+  --nav-menu-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  --nav-blur: blur(16px) saturate(120%);
+  --nav-fg: #ffffff;
+  /* The wordmark's own ink. It follows the bar's type over the hero, where
+     both are white, but parts from it on the solid state below: the links
+     read at #454545 by design, and a mark filled with that same grey goes
+     pale against white in a way type at the same value does not. */
+  --nav-logo: var(--nav-fg);
+  --nav-fg-soft: rgba(255, 255, 255, 0.8);
+  --nav-rule: rgba(255, 255, 255, 0.36);
+  /* The CTA is the inverse of the type around it, and the fill layer reads
+     these two the other way round to invert on hover. */
+  --nav-cta-bg: #ffffff;
+  --nav-cta-fg: #0a0a0a;
+  /* A hairline on the glass too. 0.16 rather than the white state's 0.12
+     because a white line at the same alpha reads fainter over a dark ground
+     than a black one does over a pale one. */
+  --nav-border: rgba(255, 255, 255, 0.16);
+
+  background-color: var(--nav-bg);
+  -webkit-backdrop-filter: var(--nav-blur);
+  backdrop-filter: var(--nav-blur);
+  border-bottom: 1px solid var(--nav-border);
+  /* The hero's video is absolutely positioned and comes later in the document,
+     so without this it paints straight over the bar. */
+  z-index: 10;
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    -webkit-backdrop-filter 300ms ease,
+    backdrop-filter 300ms ease;
+}
+
+/* --- at the very top ---
+   No glass yet: transparent and borderless, so the page's very first frame
+   is the hero's video with nothing laid over it. The moment the page moves
+   even one pixel this gives way to the glass state above, which is why this
+   overrides only the three properties that differ — everything else the
+   glass block already set (the white type, the CTA colours) is exactly
+   right here too, since the bar is still sitting on the same video.
+
+   blur(0px) here rather than dropping backdrop-filter entirely: the glass
+   state's blur(16px) needs a matching filter-function list to interpolate
+   from, the same reason the solid state below carries blur(0) instead of
+   none. */
+.nav[data-top] {
+  --nav-bg: transparent;
+  --nav-blur: blur(0px) saturate(100%);
+  --nav-border: transparent;
+}
+
+/* ...but an open menu is a surface whatever the bar behind it is doing, so
+   it keeps its own ground and the rule that separates its rows. */
+.nav[data-top] .nav__links[data-open] {
+  --nav-border: rgba(255, 255, 255, 0.16);
+}
+
+/* --- past the hero ---
+   Everything below the hero is white, so the bar turns white and the type on
+   it inverts. The blur goes with it: there is nothing worth seeing through a
+   bar the same colour as the page behind it, and it costs a compositing pass
+   on every frame. */
+.nav[data-solid] {
+  --nav-bg: #ffffff;
+  --nav-blur: blur(0) saturate(100%);
+  --nav-fg: #454545;
+  /* The page's own ink, which is what every other mark on a white ground
+     here is set in. */
+  --nav-logo: #0a0a0a;
+  --nav-fg-soft: rgba(10, 10, 10, 0.8);
+  --nav-rule: rgba(10, 10, 10, 0.36);
+  --nav-cta-bg: #0a0a0a;
+  --nav-cta-fg: #ffffff;
+  --nav-menu-bg: #ffffff;
+  --nav-menu-hover: rgba(10, 10, 10, 0.05);
+  --nav-menu-shadow: 0 18px 44px rgba(10, 10, 10, 0.14);
+  /* The only thing separating a white bar from a white page. */
+  --nav-border: rgba(10, 10, 10, 0.12);
+}
+
+/* Three columns rather than flex's space-between: the link row sits dead
+   centre of the bar this way regardless of how wide the wordmark or the
+   actions end up, instead of centring in whatever space is left once the
+   heavier side has taken its share. */
+.nav__bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1.5em;
+}
+
+/* --- logo --- */
+
+.nav__logo {
+  display: flex;
+  align-items: center;
+  /* Stated rather than left to auto-placement: the link row goes absolute
+     on narrow bars, and an absolutely positioned grid child occupies no
+     cell — so the actions would slide left into the middle column and the
+     menu button would end up 47px short of the bar's own right edge. */
+  grid-column: 1;
+  justify-self: start;
+  flex-shrink: 0;
+}
+
+.nav__logo-mark {
+  display: block;
+  /* The design's 152px against a 16px item. */
+  width: 9.5em;
+  /* A mask has no intrinsic size, so the file's own 106x33 is stated here
+     rather than left to height: auto. Owners' own lockup is a different
+     shape (194x46), set on the element itself as --logo-ratio — same
+     pattern as the audience switch's --switch-icon-size. */
+  aspect-ratio: var(--logo-ratio, 106 / 33);
+  background-color: var(--nav-logo);
+  -webkit-mask: var(--logo-mask, url("../assets/bizavLogo.svg")) center /
+    contain no-repeat;
+  mask: var(--logo-mask, url("../assets/bizavLogo.svg")) center / contain
+    no-repeat;
+  transition: background-color 300ms ease;
+}
+
+/* --- links --- */
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  /* The design's 36px. Shared with the products sub-list, so the split into
+     two lists is invisible. */
+  --nav-link-gap: 2.25em;
+  grid-column: 2;
+  gap: var(--nav-link-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* --- actions --- */
+
+.nav__actions {
+  display: flex;
+  align-items: center;
+  grid-column: 3;
+  justify-self: end;
+  /* The design's 35px — a shade tighter than the link gap, so the CTA reads
+     as separate from "Log in" rather than a matching pair. */
+  gap: 2.1875em;
+}
+
+.nav__signin {
+  position: relative;
+  display: block;
+  padding-block: 0.4375em;
+  font-weight: 500;
+  font-size: var(--nav-text);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: var(--nav-fg);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 300ms ease;
+}
+
+.nav__signin::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.25em;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 260ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.nav__signin:hover::after,
+.nav__signin:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Anchor for the annotation: it spans exactly this sub-list's width, the way
+   the bracket spans the three product links in the design. */
+.nav__products {
+  position: relative;
+}
+
+.nav__products-list {
+  display: flex;
+  align-items: center;
+  gap: var(--nav-link-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav__link {
+  position: relative;
+  display: block;
+  /* Bare text leaves the target under the 24px minimum; this takes it to
+     ~28px. Symmetric, so the row's centre stays put. */
+  padding-block: 0.4375em;
+  font-weight: 500;
+  font-size: var(--nav-text);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: var(--nav-fg);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 300ms ease;
+}
+
+/* Drawn rather than faded in: a rule that arrives all at once reads as the
+   link having changed state, one that sweeps reads as the pointer running
+   along it. scaleX off a left origin, so it is a transform the compositor
+   can carry rather than a width the layout has to re-resolve each frame. */
+.nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Clear of the descenders without dropping so far it reads as a separate
+     rule sitting under the row. */
+  bottom: 0.25em;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 260ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+/* Keyboard users get the same rule, not just the focus ring. */
+.nav__link:hover::after,
+.nav__link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* --- annotation --- */
+
+.nav__annotation {
+  /* The label lands at start + 1520ms + 720ms; the mark then holds for five
+     seconds before the same three steps run backwards. */
+  --annotation-out: calc(var(--annotation-start, 0ms) + 2240ms + 5000ms);
+  position: absolute;
+  /* The design leaves 16px between the link text and the bracket, less the
+     0.4375em the sub-list runs past that text for the hit area. */
+  top: calc(100% + 0.5625em);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* It hangs over the hero, where it must not swallow clicks. */
+  pointer-events: none;
+}
+
+.nav__annotation-bracket {
+  width: 100%;
+  height: 2em;
+  /* The stubs sit half a stroke inside the viewBox edges, and the box is
+     scaled horizontally — without this they clip. */
+  overflow: visible;
+  max-width: none;
+}
+
+.nav__annotation-bracket path {
+  fill: none;
+  stroke: var(--nav-rule);
+  stroke-width: 1;
+  /* The box is stretched to the sub-list's width, which would otherwise
+     thin the two vertical stubs to a fraction of the horizontal rule. */
+  vector-effect: non-scaling-stroke;
+}
+
+.nav__annotation-arrow {
+  display: block;
+  width: 0.5em;
+  height: 0.5625em;
+  /* Half a pixel into the rule, the overlap the design has — the two read
+     as one mark rather than as a triangle parked under a line. */
+  margin-top: -0.5px;
+}
+
+.nav__annotation-arrow path {
+  /* The design flattens this to a solid #B6AEA8 — sampled off the sky in
+     that frame. Matching the rule keeps it honest over a video whose colour
+     changes shot to shot, and lets it invert with the bar. */
+  fill: var(--nav-rule);
+}
+
+.nav__annotation-label {
+  margin-top: 0.09375em;
+  font-weight: 400;
+  font-size: var(--nav-text);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: var(--nav-fg-soft);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+}
+
+/* --- annotation intro ---
+   One sequence: the bracket draws, the arrow drops out of it, the label
+   types. Each delay is the previous step's end, so the three read as one
+   gesture rather than three animations that happen to overlap.
+
+   --annotation-start is set in JS from the hero's own timeline: the sequence
+   only begins once the chips have retracted and the carousel has taken over,
+   so the two never animate at the same time.
+
+   Each element then runs the same keyframes a second time in reverse to
+   leave, in the opposite order — label, arrow, bracket. The outgoing pass is
+   forwards-only on purpose: a "both" fill would apply its start state during
+   the delay and wipe out the incoming pass before it ever ran. */
+
+@keyframes nav-annotation-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nav-annotation-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Revealed by clip rather than by width: the label is centred, and a growing
+   box would slide it sideways as it filled. */
+@keyframes nav-annotation-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.nav__annotation-bracket path {
+  /* pathLength normalises the path to 100 units, so the dash covers it
+     whatever width the sub-list ends up at. */
+  stroke-dasharray: 100;
+  animation:
+    nav-annotation-draw 800ms cubic-bezier(0.65, 0, 0.35, 1)
+      calc(var(--annotation-start, 0ms) + 400ms) both,
+    /* Reversed, the dash retreats the way it came: down the right stub,
+       back across, up the left one. */
+    nav-annotation-draw 800ms cubic-bezier(0.65, 0, 0.35, 1)
+      calc(var(--annotation-out) + 1040ms) reverse forwards;
+}
+
+.nav__annotation-arrow {
+  animation:
+    nav-annotation-drop 320ms cubic-bezier(0.16, 1, 0.3, 1)
+      calc(var(--annotation-start, 0ms) + 1200ms) both,
+    nav-annotation-drop 320ms cubic-bezier(0.16, 1, 0.3, 1)
+      calc(var(--annotation-out) + 720ms) reverse forwards;
+}
+
+.nav__annotation-label {
+  /* One step per character of "Bizav.ai products". */
+  animation:
+    nav-annotation-type 720ms steps(17, end)
+      calc(var(--annotation-start, 0ms) + 1520ms) both,
+    /* Reversed, the clip closes from the right — characters come off the
+       end, the way a backspace would take them. */
+    nav-annotation-type 720ms steps(17, end) var(--annotation-out) reverse
+      forwards;
+}
+
+/* --- CTA ---
+   A plain white pill in the design now: the chevron accent belonged to the
+   glass bar this replaced, and at 148x44 there is no room for one. */
+
+.nav__cta {
+  /* Containing block for the fill below. */
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Fixed, the way the design's is — its own padding would not get it
+     there. 44px against a 16px item. */
+  height: 2.75em;
+  padding-inline: 1.125em;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--nav-cta-bg);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  /* Regular, not the links' medium — the design sets it apart by ground,
+     not by weight. */
+  font: inherit;
+  font-weight: 400;
+  font-size: var(--nav-text);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: var(--nav-cta-fg);
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    transform 150ms ease,
+    background-color 300ms ease,
+    color 300ms ease;
+}
+
+.nav__cta:active {
+  transform: scale(0.98);
+}
+
+/* The black ground and the white label are one layer, revealed together.
+   Transitioning the button's own colour against a separate fill cannot avoid
+   a frame where the text is white on the half that is still white — clipping
+   both at once has no such frame.
+
+   Grown from the bottom-right corner: 150% because the far corner sits at
+   sqrt(2) of the radius a percentage resolves against, so anything under
+   ~142% would stop short of it. */
+.nav__cta-fill {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  /* The bar's two CTA colours, read the other way round — which is what
+     makes the hover an inversion in both states rather than a black wipe
+     over a bar that is already black. */
+  background-color: var(--nav-cta-fg);
+  color: var(--nav-cta-bg);
+  clip-path: circle(0% at 100% 100%);
+  transition:
+    clip-path 420ms cubic-bezier(0.33, 0, 0.2, 1),
+    background-color 300ms ease,
+    color 300ms ease;
+}
+
+.nav__cta:hover .nav__cta-fill,
+.nav__cta:focus-visible .nav__cta-fill {
+  clip-path: circle(150% at 100% 100%);
+}
+
+/* --- owners download cta ---
+   The design draws this bar with a different call to action entirely — the
+   same white pill the Owners hero's own button is, not a relabelled version
+   of "Request a demo". Sized off the bar's own --nav-text rather than the
+   hero's fixed 44px, so it scales with the rest of the bar. */
+
+.nav__download {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  height: 2.75em;
+  padding-inline: 1.125em;
+  border: 0;
+  border-radius: 999px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  font: inherit;
+  font-weight: 400;
+  font-size: var(--nav-text);
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 150ms ease;
+}
+
+.nav__download:active {
+  transform: scale(0.98);
+}
+
+.nav__download-dot {
+  width: 0.25em;
+  height: 0.25em;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #66e208;
+}
+
+.nav__download-icon {
+  display: block;
+  width: 1.25em;
+  height: 1.25em;
+  flex-shrink: 0;
+}
+
+/* --- focus ---
+   The browser default ring is unreliable against a moving video, so every
+   interactive element in the bar gets an explicit one. */
+
+.nav__link:focus-visible,
+.nav__signin:focus-visible,
+.nav__logo:focus-visible,
+.nav__cta:focus-visible,
+.nav__download:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* --- responsive --- */
+
+/* --- the menu button --- */
+
+/* Hidden until the row folds. The same height as the CTA beside it, so the
+   two read as one pair of controls rather than a button and a smaller
+   afterthought, and coloured off the same --nav-* flags as everything else
+   in the bar. */
+.nav__burger {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3125em;
+  width: 2.75em;
+  height: 2.75em;
+  padding: 0;
+  border: 1px solid var(--nav-border);
+  border-radius: 999px;
+  background-color: transparent;
+  /* A button starts on the UA's own font, not the bar's — which put this
+     box at 37px against the CTA's 40 while both asked for 2.75em. */
+  font: inherit;
+  font-size: var(--nav-text);
+  color: var(--nav-fg);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    border-color 300ms ease,
+    background-color 200ms ease;
+}
+
+.nav__burger-bar {
+  display: block;
+  width: 1.125em;
+  height: 1.5px;
+  border-radius: 2px;
+  background-color: currentColor;
+  transition:
+    transform 240ms cubic-bezier(0.33, 0, 0.2, 1),
+    opacity 140ms ease;
+}
+
+/* Into an X: the outer two rotate onto the middle's line, which goes. The
+   translate is the gap plus the bar's own height, so both land dead centre
+   whatever the type scale does to the em. */
+.nav__burger[aria-expanded="true"] .nav__burger-bar:first-child {
+  transform: translateY(calc(0.3125em + 1.5px)) rotate(45deg);
+}
+
+.nav__burger[aria-expanded="true"] .nav__burger-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.nav__burger[aria-expanded="true"] .nav__burger-bar:last-child {
+  transform: translateY(calc(-0.3125em - 1.5px)) rotate(-45deg);
+}
+
+.nav__burger:hover,
+.nav__burger[aria-expanded="true"] {
+  background-color: var(--nav-menu-hover);
+}
+
+.nav__burger:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* --- narrow bars: the row becomes a card under the button --- */
+
+@media (max-width: 720px) {
+  .nav__burger {
+    display: flex;
+  }
+
+  /* A card hung off the button's own corner rather than a strip across the
+     bar: it belongs to the control that opened it, and it only takes the
+     room its rows need. Right-anchored and scaled from the same corner, so
+     it reads as coming out of the button. */
+  .nav__links {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: clamp(1.5rem, 2.78vw, 3.5rem);
+    left: auto;
+    z-index: 1;
+    flex-direction: column;
+    align-items: stretch;
+    /* Rows carry their own padding now — the row gap is just the seam
+       between two tap targets. */
+    gap: 2px;
+    width: min(17rem, calc(100vw - 2 * clamp(1.5rem, 2.78vw, 3.5rem)));
+    padding: 0.375rem;
+    border: 1px solid var(--nav-border);
+    border-radius: 18px;
+    background-color: var(--nav-menu-bg);
+    box-shadow: var(--nav-menu-shadow);
+
+    /* Closed, but still in the DOM: opacity and transform animate, and
+       display: none would not. visibility is what takes it out of the tab
+       order and off the accessibility tree while it is closed. */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.375rem) scale(0.97);
+    transform-origin: top right;
+    transition:
+      opacity 180ms ease,
+      transform 220ms cubic-bezier(0.33, 0, 0.2, 1),
+      visibility 220ms;
+  }
+
+  .nav__links[data-open] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  /* The brokers' three product links are a nested list; in a column it has
+     to stack with the rest rather than beside it. */
+  .nav__products-list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+
+  /* A bracket drawn around a horizontal run of three, pointing at them from
+     below — none of which it is any more. */
+  .nav__annotation {
+    display: none;
+  }
+
+  /* Menu rows: a whole-row target that lights up, which is what a pointer
+     expects of a menu. Bigger than the bar's own type, too — this is the
+     page's navigation now, not a strip of labels. */
+  .nav__link {
+    padding: 0.75em 0.875em;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition:
+      background-color 160ms ease,
+      color 300ms ease;
+  }
+
+  .nav__link:hover,
+  .nav__link:focus-visible {
+    background-color: var(--nav-menu-hover);
+  }
+
+  /* The row's own ground says what is under the pointer here; the sliding
+     rule was for labels sitting in a line with nothing else to show it. */
+  .nav__link::after {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* The bar is down to the wordmark, the CTA and the button by now, and on
+     the Owners bar those three plus the design's own 35px gap come to more
+     than a 390px screen has — the button ended up out in the bar's own
+     right padding. The gap goes first, then the CTA's shoulders, then the
+     wordmark, which is the piece with the most to spare at this size. */
+  .nav__actions {
+    gap: 0.5em;
+  }
+
+  .nav__cta,
+  .nav__download {
+    padding-inline: 0.75em;
+  }
+
+  .nav__logo-mark {
+    width: 7.5em;
+  }
+
+  /* The Owners pill is the wider of the two CTAs, and even after the trims
+     above its group still ran 12px past the bar's own right edge — which
+     pushed the button out with it, since a grid item wider than its column
+     overflows the end rather than the start. The dot is the one piece in
+     there carrying nothing: it is decorative, and the icon beside it
+     already says "download". */
+  .nav__download-dot {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__cta:active,
+  .nav__download:active {
+    transform: none;
+  }
+
+  /* Both states stay — they are what tells you what you are pointing at.
+     Only the sweep and the wipe go. So does the bar's own crossfade. */
+  .nav,
+  .nav__logo-mark,
+  .nav__link,
+  .nav__cta,
+  .nav__download,
+  .nav__link::after,
+  .nav__cta-fill {
+    transition: none;
+  }
+
+  /* The annotation still shows, it just arrives whole. */
+  .nav__annotation-bracket path,
+  .nav__annotation-arrow,
+  .nav__annotation-label {
+    animation: none;
+  }
+
+  .nav__annotation-bracket path {
+    stroke-dashoffset: 0;
+  }
+}

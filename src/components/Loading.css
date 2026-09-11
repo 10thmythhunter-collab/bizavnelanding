@@ -1,0 +1,379 @@
+/* One screen, one clock. The composition is the design's 1440x705 frame, and
+   it holds together only as a whole — so every measure in it, across and down
+   alike, is a share of the viewport width, and the block is centred on the
+   vertical rather than pinned to a share of a height that scales on its own.
+   The loader covers an empty page, so there is no scrollbar to put vw and the
+   container's own width out of step. */
+
+.loading {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background-color: #ffffff;
+  /* The two aircraft are placed to run off the edges of the frame, and the
+     logo is scaled a hundred-odd times over on the way out; the screen crops
+     both, it does not grow to fit them. */
+  overflow: hidden;
+  transition:
+    opacity 400ms ease,
+    visibility 0s linear 400ms;
+}
+
+.loading[data-leaving] {
+  opacity: 0;
+  /* Hidden rather than just transparent once it has faded, so it can't sit
+     over the site swallowing clicks during the last frame. */
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* --- the drawings ---
+   Each is swept over one line at a time while the bar fills. Every path
+   carries the place it holds along that sweep, written into the asset itself,
+   and turns up that many steps after the front sets off. The two run together
+   and outward from the copy, each drawn away from the middle towards the edge
+   it stands nearest. */
+
+.loading__blueprint {
+  position: absolute;
+  top: 50%;
+  /* Only bites on the <img> the fetch falls back to; the inline svg is sized
+     by the rule below. */
+  height: auto;
+  transform: translateY(-50%);
+  /* How far back the drawings sit. They come out of Figma at 0.4 and this
+     takes them a little further; it is on the drawing rather than baked into
+     the asset so it stays a number to turn, and it multiplies each line's own
+     fade rather than fighting it. */
+  opacity: 0.8;
+}
+
+/* Straight off the design frame, in a 1440x705 screen: the aircraft stand
+   clear of both edges, 470 across at x=10 and at x=960. */
+.loading__blueprint--left {
+  left: 0.694vw;
+  width: 32.639vw;
+}
+
+.loading__blueprint--right {
+  left: 66.667vw;
+  width: 32.639vw;
+}
+
+.loading__blueprint svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.loading__blueprint .ink {
+  animation: loading-line var(--line-ms) ease-out both;
+  animation-delay: calc(var(--draw-at, 0ms) + var(--i, 0) * var(--line-step, 0ms));
+}
+
+@keyframes loading-line {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --- the copy ---
+   550 wide at x=445, a centred column of logo, headline and bar on even 32px
+   gaps. It is there from the first frame: the bar has to report from the
+   first frame, and the column reads as one block with it. */
+
+.loading__copy {
+  position: absolute;
+  left: 30.903vw;
+  top: calc(50% - 12.213vw);
+  width: 38.194vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.222vw;
+}
+
+.loading__lockup {
+  display: block;
+  /* 170 of 1440 across. */
+  width: 11.806vw;
+  height: auto;
+  max-width: none;
+}
+
+.loading__headline {
+  margin: 0;
+  font-weight: 400;
+  /* 56px at the design width, on the family's own leading. */
+  font-size: clamp(1.75rem, 3.889vw, 3.5rem);
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: #000000;
+  text-align: center;
+}
+
+.loading__line {
+  display: block;
+}
+
+/* --- the bar ---
+   370 wide, 6px above its status line. */
+
+.loading__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(25.694vw, calc(100% - 3rem));
+}
+
+.loading__bar {
+  position: relative;
+  /* Tall enough for the plane, which overhangs the track on both sides. */
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.loading__track {
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background-color: rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.loading__fill {
+  width: calc(var(--progress, 0) * 100%);
+  height: 100%;
+  border-radius: 2px;
+  background-color: rgba(65, 65, 65, 0.45);
+}
+
+.loading__plane {
+  position: absolute;
+  top: 0;
+  /* Rides the tip of the fill. The floor keeps it from hanging off the left
+     end in the first frames, before there is any fill to ride. */
+  left: max(12px, calc(var(--progress, 0) * 100%));
+  width: 24px;
+  height: 24px;
+  transform: translateX(-50%);
+}
+
+.loading__status {
+  /* All the lines share one cell: the block is one line tall and as wide as
+     the longest message, so nothing shifts as they cycle. */
+  display: grid;
+  justify-items: center;
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+
+.loading__message {
+  grid-area: 1 / 1;
+  transition:
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 200ms linear;
+}
+
+.loading__message[data-slot="current"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Spent lines leave upward and the next one waits below, so the strip only
+   ever travels in one direction. */
+.loading__message[data-slot="past"] {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.loading__message[data-slot="next"] {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Below the design's proportions the aircraft and the copy stop fitting side
+   by side. */
+@media (max-width: 900px) {
+  /* The aircraft need the full frame to stand either side of the copy, and
+     there isn't one; the copy has the screen to itself. */
+  .loading__blueprint--left,
+  .loading__blueprint--right {
+    display: none;
+  }
+
+  .loading__copy {
+    left: 6%;
+    right: 6%;
+    top: 50%;
+    width: auto;
+    transform: translateY(-50%);
+    gap: 1.5rem;
+  }
+
+  .loading__lockup {
+    width: min(170px, 45%);
+  }
+
+  .loading__group {
+    width: min(370px, 100%);
+  }
+}
+
+/* --- the exit ---
+   The drawings retreat the way they came while everything but the logo
+   softens out of focus — together, not one after the other. Then the logo
+   walks to the middle of the screen, holds a beat, and the frame dives into
+   the "a" of .ai. --dx and --dy are measured in JS, because where the logo
+   starts depends on where the copy wrapped.
+
+   Nothing here may reuse a keyframe name the element is already running: same
+   name means the browser updates that animation instead of starting one, and
+   it keeps the start time it was given a stage ago, so a delay measured from
+   the exit has already run out and the element snaps straight to the end. */
+
+@keyframes loading-vanish {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Not a fade as a block — it un-draws. Each line runs from the last one laid
+   down back to the first, so the pen retreats the way it came. Filled both
+   ways: a line has to stand there until its turn comes, and the entrance it
+   was holding is gone the moment this replaces it. */
+.loading[data-stage="exit"] .loading__blueprint .ink {
+  animation: loading-vanish var(--line-ms) ease-in
+    calc((var(--steps, 1) - var(--i, 0)) * var(--undraw-step, 0ms)) both;
+}
+
+/* Blur and opacity together: fading alone reads as a dissolve, blurring alone
+   as a smear. */
+@keyframes loading-defocus {
+  from {
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(12px);
+  }
+}
+
+.loading[data-stage="exit"] .loading__headline,
+.loading[data-stage="exit"] .loading__group {
+  animation: loading-defocus var(--vanish-ms) ease-in both;
+}
+
+.loading[data-stage="exit"] .loading__lockup {
+  position: relative;
+  z-index: 1;
+  /* The left side of the bowl of the first "a", the one in "bizav": 107.7 of
+     172 across and 27.05 of 54 down in the asset's own coordinates. The ink
+     there is 4.5 units thick and runs 12 deep, which is what lets the dive
+     end on solid black. Scaling about that point keeps it nailed to the
+     middle of the frame while the ink swallows everything. */
+  transform-origin: 62.6% 50.1%;
+  animation:
+    /* Waits out the un-drawing: the screen is empty but for the logo before
+       it moves. */
+    loading-center var(--lift-ms) cubic-bezier(0.65, 0, 0.35, 1) var(--lift-at)
+      both,
+    /* Forwards-only: a "both" fill would apply its start state during the
+       delay and cancel the walk before it ran. */
+    loading-zoom var(--zoom-ms) cubic-bezier(0.55, 0, 1, 0.45) var(--zoom-at)
+      forwards;
+}
+
+@keyframes loading-center {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--dx, 0), var(--dy, 0));
+  }
+}
+
+@keyframes loading-zoom {
+  from {
+    transform: translate(var(--dx, 0), var(--dy, 0)) scale(1);
+  }
+  to {
+    /* The second translate is a share of the logo's own width, which pulls
+       the focal point from where it sits in the wordmark to dead centre. */
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-12.6%, 0)
+      scale(140);
+  }
+}
+
+/* Ink can only get so far on its own — the last of the black comes from here,
+   under cover of the zoom. */
+.loading__ink {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-color: #000000;
+  animation: loading-black var(--black-ms) ease-in var(--black-at) both;
+}
+
+@keyframes loading-black {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The bar still fills — that is the information. Only the slide goes. */
+  .loading__message {
+    transition: opacity 200ms linear;
+    transform: none;
+  }
+
+  /* One fade for each drawing rather than several hundred. */
+  .loading__blueprint .ink,
+  .loading[data-stage="exit"] .loading__blueprint .ink {
+    animation: none;
+  }
+
+  .loading__blueprint {
+    animation: loading-fade var(--load-ms) ease-out both;
+  }
+
+  .loading[data-stage="exit"] .loading__blueprint {
+    animation: loading-vanish var(--undraw-ms) ease-in both;
+  }
+
+  /* Only the blur goes; the copy still leaves on the same clock. */
+  .loading[data-stage="exit"] .loading__headline,
+  .loading[data-stage="exit"] .loading__group {
+    animation-name: loading-vanish;
+  }
+
+  /* No dive: the screen simply goes to black under the standing logo. */
+  .loading[data-stage="exit"] .loading__lockup {
+    animation: loading-center var(--lift-ms) ease-out var(--lift-at) both;
+  }
+
+  @keyframes loading-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

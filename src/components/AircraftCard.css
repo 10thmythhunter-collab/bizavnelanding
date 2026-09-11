@@ -1,0 +1,118 @@
+/* One em to ten design pixels throughout — see AircraftCard.jsx. Nothing
+   here sets a font-size or a width: both come from the caller, which is what
+   lets the same card be 360x112 in one place and a tenth of that in another
+   without a second set of numbers. */
+
+.tail {
+  display: flex;
+  height: 11.2em;
+  align-items: center;
+  border: 0.1em solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.6em;
+  background-color: rgba(22, 22, 22, 0.6);
+  -webkit-backdrop-filter: blur(1em);
+  backdrop-filter: blur(1em);
+  overflow: hidden;
+}
+
+.tail__media {
+  position: relative;
+  width: 14.8em;
+  height: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.tail__glow,
+.tail__pool,
+.tail__render {
+  position: absolute;
+  display: block;
+}
+
+.tail__glow {
+  top: 0.8em;
+  left: -0.1em;
+  width: 15em;
+  height: 9.6em;
+}
+
+.tail__pool {
+  top: 7.2em;
+  left: 2em;
+  width: 10.8em;
+  height: 1.6em;
+}
+
+.tail__render {
+  top: 3.5em;
+  left: 0.8em;
+  width: 13.2em;
+  height: 4.2em;
+  object-fit: cover;
+}
+
+/* The divider is the media column's own right edge rather than an element:
+   one less absolutely positioned hairline to keep in place. */
+.tail__media::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 0.1em;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.tail__body {
+  display: flex;
+  flex: 1 0 0;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8em;
+  padding-inline: 1.6em;
+  overflow: hidden;
+}
+
+.tail__name {
+  font-weight: 600;
+  font-size: 1.6em;
+  line-height: 1.375;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.tail__meta {
+  max-width: 100%;
+  font-weight: 400;
+  font-size: 1.2em;
+  line-height: 1.3333;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tail__figures {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  white-space: nowrap;
+}
+
+.tail__ticker {
+  font-weight: 700;
+  font-size: 1.6em;
+  line-height: 1.25;
+  /* The design's 4.48px at 16px. */
+  letter-spacing: 0.28em;
+  color: #ffffff;
+}
+
+.tail__change {
+  font-weight: 500;
+  font-size: 1.4em;
+  line-height: 1.2857;
+  color: #2daa00;
+}

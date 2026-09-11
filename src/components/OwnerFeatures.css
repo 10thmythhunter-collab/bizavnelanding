@@ -1,0 +1,135 @@
+/* Node 215:21303's "WHAT OWNERS DOES" panel — full-bleed, the design's own
+   1440-wide box, with the tilted phone floating past its own bottom-right
+   corner into the white section below rather than sitting inside it. */
+
+/* One inset on both sides rather than the design's own pair (160 left
+   against a phone hard on the right edge): equal margins are what let the
+   copy and the phone read as two halves of one panel, and pulling both in
+   to 200 closes the 200px of dead air that was sitting between them. */
+.owner-features {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-block: clamp(1.5rem, 2.22vw, 2rem) clamp(2rem, 3.33vw, 3rem);
+  padding-inline: clamp(1.5rem, 13.89vw, 12.5rem);
+  background-color: rgba(243, 243, 243, 0.5);
+}
+
+.owner-features__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  max-width: 33rem;
+}
+
+.owner-features__eyebrow {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.625rem;
+  line-height: normal;
+  letter-spacing: 0.1em;
+  color: #0a0a0a;
+}
+
+.owner-features__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.owner-features__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
+
+.owner-features__body {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #4b5563;
+}
+
+.owner-features__body strong {
+  font-weight: 700;
+  color: #0e0e0e;
+}
+
+.owner-features__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.owner-features__pill {
+  padding: 7px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  background-color: #ffffff;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  white-space: nowrap;
+}
+
+.owner-features__badge img {
+  display: block;
+  width: 146px;
+  height: auto;
+}
+
+/* The provided phone render — cropped to its own visible content
+   (2250×3088) rather than the original 4650×3425 canvas it shipped on,
+   which carried a huge transparent margin around the phone. That margin
+   was harmless while the image floated off-layout as an absolutely
+   positioned overlay, but once centered as a normal flex item (on
+   request) its own box — margin included — started taking real space in
+   the row, ballooning the section's height and shoving everything below
+   it down the page. Cropped, its box finally matches what's actually
+   visible. Decorative photography, not an interactive scene, so
+   pointer-events: none stays. */
+.owner-features__phone {
+  display: block;
+  flex-shrink: 0;
+  width: clamp(14.4rem, 27.57vw, 24.82rem);
+  aspect-ratio: 2250 / 3088;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  /* Below this the phone would either overlap the copy or run off the
+     section entirely — dropped rather than shrunk past usefulness, the
+     design has no mobile frame for this panel to fall back on. */
+  .owner-features__phone {
+    display: none;
+  }
+
+  .owner-features__copy {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .owner-features {
+    text-align: center;
+  }
+
+  .owner-features__copy {
+    align-items: center;
+  }
+
+  .owner-features__pills {
+    justify-content: center;
+  }
+}

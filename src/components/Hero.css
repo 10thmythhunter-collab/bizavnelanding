@@ -1,0 +1,670 @@
+.hero {
+  position: relative;
+  width: 100%;
+  /* svh, not vh: on mobile 100vh is measured against the *largest* viewport
+     (URL bar hidden), so a vh hero always overflows on load. svh guarantees
+     the frame fits without the jank dvh causes when the bar collapses.
+     The px floor keeps the content from being crushed on landscape phones. */
+  min-height: max(100vh, 420px);
+  min-height: max(100svh, 420px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background-color: #08060d;
+  /* Single source of truth for the body line and the chips that continue it.
+     The chips size themselves in em off this, so the two can't drift apart. */
+  --hero-body-size: 1.0625rem;
+  /* Chips sit just under the body line so they read as tags inside the
+     sentence rather than as peers of it. Every chip value is in em, so this
+     one ratio drives the label, padding, gap and icon together. */
+  --hero-chip-size: calc(var(--hero-body-size) * 0.941);
+}
+
+/* --- background --- */
+
+.hero__media {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Stacked rather than swapping one element's src: both stay decoded and
+   playing, and the switch is only ever which one is opaque — a src change on
+   a single <video> reloads the stream and drops a frame to black first. */
+.hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.hero__video[data-active] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__video {
+    transition: none;
+  }
+}
+
+/* One layer, matching the design: a shallow ramp from 30% to 50% black.
+   The range is narrow enough that two stops don't band the way a scrim
+   reaching full opacity at the bottom would. */
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.5)
+  );
+}
+
+/* --- content ---
+   Fluid values are tuned so the 1440px viewport lands on the Figma spec
+   (64px title, 17px body, 40px inset, 58px bottom), then scale smoothly
+   instead of stepping at breakpoints. */
+
+.hero__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* Flat, not fluid: the design puts the same 16px between all four blocks
+     and 16px is already the floor the fluid values elsewhere bottom out at. */
+  gap: 1rem;
+  padding-inline: clamp(1.5rem, 2.78vw, 3.5rem);
+  padding-bottom: clamp(2.5rem, 4.03vw, 3.625rem);
+  max-width: 100%;
+}
+
+/* --- audience stage ---
+   Both panels — Brokers' and Owners' — share one grid cell, the same trick
+   the testimonials carousel uses: the stage's own height follows whichever
+   panel is taller instead of snapping to the other's when the switch fires,
+   and the switch above never moves because it lives outside the stage
+   entirely. */
+
+.hero__stage {
+  position: relative;
+  display: grid;
+  width: 100%;
+  max-width: 100%;
+}
+
+.hero__panel {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* Both panels share this one cell so they can cross-fade in place, which
+     means the cell is as tall as the taller of the two — the brokers' own,
+     with its chips and its four stats. Packed from the top, the shorter
+     Owners panel then floats with the difference under it: 177px of it at
+     390, where the brokers' stats wrap into three rows. From the bottom,
+     it sits on the hero's own floor either way. */
+  justify-content: flex-end;
+  gap: 1rem;
+  min-width: 0;
+  max-width: 100%;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The one on show is the only one in the cell's flow, so the stage is as
+   tall as it rather than as tall as the taller of the two. That is what
+   brings the switch above down onto the Owners panel instead of leaving it
+   parked at the height the brokers' own chips and stats need. The other
+   panel is lifted out below — still painted, still fading, just not
+   counted. */
+.hero__panel[data-active] {
+  position: relative;
+  opacity: 1;
+  transform: none;
+  /* Above the outgoing panel while both are mid-fade, so the incoming one
+     is what a reader sees the instant it is more opaque than the other
+     rather than whichever happens to be later in the DOM. */
+  z-index: 1;
+}
+
+/* Out of the flow, pinned to the same floor it would have sat on, so it
+   fades out where it was rather than jumping as it leaves. */
+.hero__panel:not([data-active]) {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__panel {
+    transition: none;
+  }
+}
+
+/* --- audience switch ---
+   The selection itself lives in App now: switching to Owners fades the rest
+   of the page out too (see App.jsx), which the hero alone had no way to
+   reach — so the state moved up and this reads it back over props. */
+
+.hero__switch {
+  display: inline-flex;
+  align-items: center;
+  /* The 4px inset is the whole reason the selected pill reads as sitting
+     inside a track rather than replacing it. */
+  padding: 4px;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background-color: rgba(158, 158, 158, 0.06);
+  /* Same glass as the product chips below — one blur radius across the hero. */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.hero__switch-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 18px;
+  border: 0;
+  border-radius: 999px;
+  background-color: transparent;
+  font: inherit;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 200ms ease,
+    box-shadow 200ms ease,
+    color 200ms ease;
+}
+
+.hero__switch-option[aria-pressed="true"] {
+  background-color: #ffffff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  color: #0a0a0a;
+}
+
+.hero__switch-option:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+.hero__switch-dot {
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #66e208;
+  /* Present at all times now — see the comment in Hero.jsx — so switching
+     is only ever this fading in on one button and out on the other, never a
+     size change on either. */
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.hero__switch-dot[data-active] {
+  opacity: 1;
+  transform: none;
+}
+
+.hero__switch-icon {
+  display: block;
+  /* Brokers' mark is 18px and Owners' 16px in the design — the glyphs have
+     different amounts of air, so one box size would read as two weights. */
+  width: var(--switch-icon-size);
+  height: var(--switch-icon-size);
+  flex-shrink: 0;
+  /* Masked, not an <img>: the exported files have their fill baked in, and
+     the glyph has to invert with the option it sits in. */
+  background-color: currentColor;
+  -webkit-mask: var(--switch-icon) center / contain no-repeat;
+  mask: var(--switch-icon) center / contain no-repeat;
+}
+
+/* --- owners download cta ---
+   The design's own white pill, at its own 44px height rather than the
+   switch option's — the two only happen to share a colour, not a size. */
+
+.hero__download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding-inline: 18px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  font: inherit;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hero__download-dot {
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #66e208;
+}
+
+.hero__download-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.hero__download:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* --- headline --- */
+
+.hero__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(2rem, 4.44vw, 4rem);
+  line-height: 1.125;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  /* Locks the type to the surface without reading as a drop shadow. */
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    0 2px 14px rgba(0, 0, 0, 0.2);
+  overflow-wrap: break-word;
+}
+
+.hero__title span {
+  display: block;
+}
+
+.hero__subtitle {
+  display: flex;
+  align-items: center;
+  /* Wider than the chip-to-chip gap below, so the three chips read as one
+     group rather than as three items trailing off the sentence. */
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero__subtitle-text {
+  margin: 0;
+  font-weight: 400;
+  /* The chips size themselves off this, so the sentence and the tags
+     continuing it can't drift apart. */
+  font-size: var(--hero-body-size);
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  max-width: 62ch;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+/* --- product pills (Anti-Metal Button) --- */
+
+.hero__products {
+  display: flex;
+  align-items: center;
+  /* Shared with the emerge keyframes below, which offset each chip by its
+     own width plus this gap. */
+  --chip-gap: 0.75rem;
+  gap: var(--chip-gap);
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero__pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  /* font-size lives on the chip, not the label, so every em below resolves
+     against the label's size — padding, gap and icon all scale together. */
+  font-size: var(--hero-chip-size);
+  gap: 0.5em;
+  padding-block: 0.25em;
+  padding-inline: 1em;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background-color: rgba(158, 158, 158, 0.04);
+  /* The fill is almost fully transparent by design — the glass read comes
+     from blurring the video behind the pill, not from the background. */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hero__pill-icon {
+  /* Sized in em off the label. Aira and Signals get a larger box on
+     purpose: one is a radial burst with empty space at the edges, the other
+     a wave half as tall as it is wide, so at the same box size as Terminal
+     both read visibly smaller. 1.3em is the label's own line box, which is
+     what keeps them from driving the chip taller than the design's 30px. */
+  width: var(--pill-icon-scale, 1.1875em);
+  height: var(--pill-icon-scale, 1.1875em);
+  display: block;
+  flex-shrink: 0;
+}
+
+.hero__pill-label {
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: -0.025em;
+}
+
+/* --- vertical carousel inside the first chip --- */
+
+.hero__carousel {
+  display: grid;
+  align-items: center;
+  /* The cell is as wide as the widest product, so the shorter ones would
+     otherwise sit flush left with dead space trailing them. */
+  justify-items: center;
+}
+
+.hero__carousel-item {
+  /* All three products share one grid cell, so the chip is sized by the
+     widest of them and holds still while they cycle. The chip's own
+     overflow: hidden is what clips the ones parked off-frame. */
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.hero__carousel-item[data-slot="current"] {
+  opacity: 1;
+  transform: none;
+}
+
+.hero__carousel-item[data-slot="below"] {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.hero__carousel-item[data-slot="current"],
+.hero__carousel-item[data-slot="below"] {
+  transition:
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 260ms linear;
+}
+
+/* No transition on the way back up. An item that just dropped out of the
+   bottom gets recycled to the top, and animating that would drag it back
+   across the chip in full view. */
+.hero__carousel-item[data-slot="above"] {
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: none;
+}
+
+/* --- stats --- */
+
+.hero__stats {
+  /* stretch, so the dividers run the full height of the tallest column
+     the way the single rule does in the design. */
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  /* The design's 34px text-to-text spacing, kept whole: the rule is drawn
+     in the middle of it rather than on a column's edge. */
+  --stat-gap: clamp(1.25rem, 2.36vw, 2.125rem);
+  gap: var(--stat-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.hero__stat {
+  /* Anchor for the rule between columns. */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 75px;
+  text-align: center;
+}
+
+/* Centred in the gap rather than drawn as a border on the column's edge:
+   box-sizing is border-box everywhere in this project, so a border plus the
+   padding that balanced it were both being taken out of the 75px column —
+   which pulled every rule after the first left of where the design has it. */
+.hero__stat + .hero__stat::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--stat-gap) / -2);
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.hero__stat-value {
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero__stat-label {
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* --- entrance --- */
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Each chip starts shifted left by its own width plus the gap, which lands
+   it exactly inside the previous chip's footprint — so it begins fully
+   occluded and slides out from underneath. */
+@keyframes hero-chip-emerge {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-100% - var(--chip-gap)));
+  }
+  /* Opaque early: by this point the easing has already carried it clear of
+     its predecessor, so it is seen emerging rather than fading in. */
+  22% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Animated on the leaf elements, not on .hero__subtitle: a transform or an
+   opacity below 1 on an ancestor makes that ancestor a backdrop root, which
+   leaves the pills with nothing to blur until the animation settles. An
+   element's own transform is fine.
+
+   Scoped to the panel that starts active: both panels' titles exist in the
+   DOM from the first frame — see .hero__stage below — and without this the
+   Owners panel's copy would rise in too, unseen but not free, behind its
+   own opacity: 0. */
+.hero__switch,
+.hero__panel[data-active] .hero__title,
+.hero__panel[data-active] .hero__subtitle-text,
+.hero__panel[data-active] .hero__stats {
+  animation: hero-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero__panel[data-active] .hero__subtitle-text {
+  animation-delay: 120ms;
+}
+
+.hero__panel[data-active] .hero__stats {
+  animation-delay: 240ms;
+}
+
+/* The descending z-index is what makes each chip read as coming *out of* its
+   predecessor instead of sliding in over it. It also covers the fact that
+   Owners is wider than Aira: at rest it overhangs to the left, and only
+   Terminal sitting on top keeps that overhang hidden. */
+.hero__pill:nth-child(1) {
+  z-index: 3;
+  animation: hero-rise 450ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
+}
+
+.hero__pill:nth-child(2) {
+  z-index: 2;
+  animation: hero-chip-emerge 420ms cubic-bezier(0.16, 1, 0.3, 1) 560ms both;
+}
+
+.hero__pill:nth-child(3) {
+  z-index: 1;
+  animation: hero-chip-emerge 420ms cubic-bezier(0.16, 1, 0.3, 1) 820ms both;
+}
+
+/* Once the audience has been switched, the arrival is over: the panels
+   cross-fade from here on, and re-running the rise on whichever panel just
+   became active fights that fade — the incoming copy climbs 14px through it
+   while the outgoing copy, having just lost the same animation, snaps back
+   to where the animation was holding it. The chips go with it for the same
+   reason: they would re-emerge from under each other on every return to
+   Brokers. */
+.hero[data-switched] .hero__panel[data-active] .hero__title,
+.hero[data-switched] .hero__panel[data-active] .hero__subtitle-text,
+.hero[data-switched] .hero__panel[data-active] .hero__stats,
+.hero[data-switched] .hero__pill {
+  animation: none;
+}
+
+/* --- retract ---
+   --retract-x is measured in JS: each chip has to land behind the *first*
+   chip, and the distance to it isn't something CSS can express. The
+   per-chip "own width + gap" trick used on the way out won't do here,
+   because both chips move at once — chip 3 would stop at chip 2's vacated
+   slot instead of continuing behind Terminal. */
+
+@keyframes hero-chip-retract {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(var(--retract-x, 0));
+  }
+}
+
+/* Reverse of the entrance order — the outermost chip tucks in first. */
+.hero__products--retract .hero__pill:nth-child(3) {
+  animation: hero-chip-retract 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero__products--retract .hero__pill:nth-child(2) {
+  animation: hero-chip-retract 420ms cubic-bezier(0.16, 1, 0.3, 1) 70ms both;
+}
+
+/* Dropped from layout, not just hidden: left in place they would keep the
+   list three chips wide and push the whole row's wrap point out. */
+.hero__products--carousel .hero__pill:nth-child(n + 2) {
+  display: none;
+}
+
+/* Under reduced motion the phase never advances past "intro", so the three
+   chips simply stand still. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__switch,
+  .hero__panel[data-active] .hero__title,
+  .hero__panel[data-active] .hero__subtitle-text,
+  .hero__panel[data-active] .hero__stats,
+  .hero__pill {
+    animation: none;
+  }
+
+  .hero__switch-option,
+  .hero__switch-dot {
+    transition: none;
+  }
+
+  .hero__carousel-item {
+    transition: none;
+  }
+}
+
+/* --- responsive --- */
+
+@media (max-width: 700px) {
+  /* Below this width the Figma line break stops being useful — let the
+     headline wrap on its own and balance the resulting lines. */
+  .hero__title span {
+    display: inline;
+  }
+
+  .hero__title {
+    text-wrap: balance;
+  }
+
+  /* The chips follow this down, so the whole subtitle block shrinks as one. */
+  .hero {
+    --hero-body-size: 1rem;
+  }
+
+  .hero__stat {
+    min-width: 0;
+  }
+
+  /* The row wraps at this width, and CSS cannot tell which item starts a new
+     line — so the rule would be left hanging at the row's own left edge.
+     There is no mobile frame to match, and no rules reads better than a
+     stray one. */
+  .hero__stat + .hero__stat::before {
+    content: none;
+  }
+
+  .hero__stat-value {
+    font-size: 1.2rem;
+  }
+
+  .hero__stat-label {
+    font-size: 1rem;
+  }
+}

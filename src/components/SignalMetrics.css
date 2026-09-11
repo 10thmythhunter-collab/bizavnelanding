@@ -1,0 +1,195 @@
+/* Node 205:19561 — 1440x608, which is the card row (1362x523 at x=40, y=46)
+   plus 46 above it and 39 below. Fluid values land on those at 1440.
+
+   The cards carry no fill: an outline on the page's white, which is what
+   lifts them off the black band above without adding another surface. */
+
+.metrics {
+  padding-block: clamp(2rem, 3.19vw, 2.875rem) clamp(1.75rem, 2.71vw, 2.4375rem);
+  /* The same 40px inset the products row above uses. */
+  padding-inline: clamp(1.5rem, 2.78vw, 3.5rem);
+  background-color: #ffffff;
+}
+
+/* Columns rather than a wrapping flex row, and for the same reason as the
+   products row above: wrapping let a card that broke onto a line of its own
+   grow into the whole width, which the 442/523 ratio below then turned into
+   height. Fixed column counts give a broken card exactly one column, so it
+   comes out the size of its siblings whichever row it lands on. The
+   breakpoints are that row's own, so the two never disagree about how many
+   cards fit. */
+.metrics__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  /* The design's own 18px, side to side. */
+  column-gap: 18px;
+  /* Stacked, 18px would sit tighter than the 24px inside a card's own copy
+     block, and the seam between two cards would read as the smaller break
+     of the two. */
+  row-gap: clamp(2.5rem, 4vw, 3rem);
+  /* Three 442px cards and two 18px gaps. */
+  max-width: 1362px;
+  /* Both zeroed: a ul carries a 1em block margin of its own, which would add
+     16px to the padding at each end of the section. */
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.metrics__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* The copy sits on the floor of the card — the design leaves the top two
+     thirds empty. */
+  justify-content: flex-end;
+  min-width: 0;
+  /* The design's 442x523, as a ratio rather than a height, so the card keeps
+     its shape as the row narrows. */
+  aspect-ratio: 442 / 523;
+  padding: 1rem 1rem 2.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* --- the first card's hover scene --- */
+
+.metrics__scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.metrics__card[data-scene]:hover .metrics__scene {
+  opacity: 1;
+}
+
+/* The scene, pinned to the card behind everything else in it. The embed
+   writes its own position:relative inline, which is what makes an absolute
+   wrapper necessary rather than sizing the div itself. */
+.metrics__scene-embed {
+  position: absolute !important;
+  inset: 0;
+}
+
+.metrics__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* The design gives the first card 32 and the other two 24. Taking the
+     pair's value: 24 with the first card's two-line caption is what the
+     other two already do. */
+  gap: 1.5rem;
+  /* The design's own 384 measure inside a 410 padding box, which is what
+     puts the break in the captions. */
+  width: 384px;
+  max-width: 100%;
+  color: #0a0a0a;
+  /* Only a card with a scene switches at all — see the rule below — and only
+     that card's own hover drives it, so a sibling's transition finishing
+     late can never leave this one part-way there. */
+  transition: color 400ms ease;
+}
+
+.metrics__card[data-scene]:hover .metrics__body {
+  color: #ffffff;
+}
+
+.metrics__label {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: normal;
+  /* The design's 1.2px at 12px — the same 0.1em every other eyebrow on the
+     page carries. */
+  letter-spacing: 0.1em;
+}
+
+.metrics__figure {
+  margin: 0;
+  font-weight: 600;
+  /* 40px, the size the section titles run at. */
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+}
+
+.metrics__note {
+  margin: 0;
+  /* Light, which is the design's own weight here and the only place on the
+     page that uses it. */
+  font-weight: 300;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metrics__scene,
+  .metrics__body {
+    transition: none;
+  }
+}
+
+/* --- the row arriving ---
+
+   Each card rises into place, one after the next. Keyed off data-reveal,
+   which SignalMetrics.jsx writes onto the row on mount: nothing here hides a
+   card until the script that can show it again is running, so a reader
+   without JavaScript gets all three outright. "done" is set once, on the
+   first crossing, and never unset — scrolling back up leaves them where they
+   are.
+
+   The rise is on the card, not on its copy, so the outline comes up with the
+   words inside it as one piece. */
+
+.metrics__list[data-reveal] .metrics__card {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.metrics__list[data-reveal="done"] .metrics__card {
+  opacity: 1;
+  transform: none;
+  /* Each card's own delay comes in from the markup, in the order they sit
+     in the row. */
+  transition:
+    opacity 480ms ease var(--metrics-in, 0ms),
+    transform 620ms cubic-bezier(0.16, 1, 0.3, 1) var(--metrics-in, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metrics__list[data-reveal] .metrics__card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* --- responsive --- */
+
+/* Where the three stop fitting: 3 x 20rem plus the gaps and the section's
+   own inset. Two columns from here, so the third card takes one of them
+   rather than the row. */
+@media (max-width: 1049px) {
+  .metrics__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  /* One column, capped at the design's own card width. The cap is what used
+     to be handled by dropping the card's aspect-ratio here and giving it a
+     min-height instead: a full-width card at 442/523 was 700-odd pixels of
+     mostly empty box. Capping the row keeps the design's shape at every
+     width instead of trading it away on small screens. */
+  .metrics__list {
+    grid-template-columns: 1fr;
+    max-width: 442px;
+  }
+}

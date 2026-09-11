@@ -1,0 +1,359 @@
+/* The chat the CTA opens — node 178:16870, which is the same AIRA section
+   with the copy column swapped for a transcript and a Back pill.
+
+   The design draws this panel at 558px with 16-17px type, and unlike its
+   headline block that is already the size the rest of the site runs at, so
+   these values are the design's own rather than the 0.75 the section's
+   headline and body were brought down to. */
+
+.aira-chat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  /* Takes the copy column's place: the design's 558, shrinking below that
+     rather than growing past it. */
+  flex: 0 1 558px;
+  min-width: 0;
+  animation: aira-chat-enter 420ms cubic-bezier(0.33, 0, 0.2, 1) both;
+}
+
+@keyframes aira-chat-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+/* --- panel --- */
+
+.aira-chat__panel {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 28px;
+  background-color: rgba(0, 0, 0, 0.12);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+.aira-chat__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.aira-chat__who {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 25px;
+  color: #fbfbfb;
+  white-space: nowrap;
+}
+
+/* The burst is wider than its box in the design and cropped to it. */
+.aira-chat__avatar {
+  display: block;
+  width: 22px;
+  height: 24px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.aira-chat__status {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 17px;
+  color: rgba(251, 251, 251, 0.55);
+  white-space: nowrap;
+}
+
+.aira-chat__divider {
+  margin-top: 20px;
+  height: 1px;
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* --- the transcript --- */
+
+/* Capped so the panel cannot outgrow the burst beside it: the row centres
+   both columns on the taller one, and a transcript that kept growing would
+   push the section — and the footer under it — down as it played. 300 leaves
+   the panel, the gap and the Back pill at the burst's own height at 1440,
+   and the opening exchange still fits without scrolling; only the follow-up
+   scrolls, which AiraChat.jsx follows to the newest message.
+
+   The scrollbar is hidden rather than styled — a track down the inside of a
+   glass panel reads as a mistake, and nothing here asks to be scrolled by
+   hand. */
+.aira-chat__log {
+  max-height: 300px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  /* The component moves scrollTop directly; this is what makes that a glide
+     rather than a jump. */
+  scroll-behavior: smooth;
+  /* Once the follow-up pushes the opening off the top, the message up there
+     is cut by the log's edge a few pixels under the divider. The fade is what
+     makes that read as scrolled-away rather than as a clipping mistake; in
+     the opening exchange, which never overflows, it falls entirely inside the
+     first message's top padding and shows nothing. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+}
+
+.aira-chat__log::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each message unfolds rather than appearing at full height: a grid row
+   interpolates 0fr to 1fr, which is the one way to animate to a height the
+   content decides. The clip is what hides the part not yet unfolded. */
+.aira-chat__reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: aira-chat-open 420ms cubic-bezier(0.33, 0, 0.2, 1) both;
+}
+
+.aira-chat__clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The panel's 20px rhythm lives here rather than as a gap on the log, so the
+   space a message takes and the space before it unfold together — a gap
+   would snap into place a beat before the bubble it belongs to. */
+.aira-chat__slot {
+  padding-top: 20px;
+  animation: aira-chat-rise 420ms ease both 120ms;
+}
+
+.aira-chat__slot[data-kind="user"] {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.aira-chat__slot[data-kind="suggest"] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+@keyframes aira-chat-open {
+  from {
+    grid-template-rows: 0fr;
+  }
+}
+
+@keyframes aira-chat-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.375rem);
+  }
+}
+
+/* On its way out: the row folds back to nothing while the bubble fades, so
+   the answer taking its place grows into the space it leaves. */
+.aira-chat__reveal[data-exit] {
+  animation: aira-chat-close 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.aira-chat__reveal[data-exit] .aira-chat__slot {
+  animation: aira-chat-sink 220ms ease both;
+}
+
+@keyframes aira-chat-close {
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+
+@keyframes aira-chat-sink {
+  to {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+/* --- bubbles --- */
+
+.aira-chat__bubble {
+  margin: 0;
+  padding: 14px 20px;
+  border: 1px solid;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 23px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  text-wrap: pretty;
+}
+
+/* The square corner marks who is speaking: bottom-right for the person,
+   bottom-left for the agent. */
+.aira-chat__bubble--user {
+  width: 310px;
+  max-width: 100%;
+  border-radius: 22px 22px 4px 22px;
+  border-color: rgba(255, 255, 255, 0.14);
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fbfbfb;
+}
+
+.aira-chat__bubble--ai {
+  border-radius: 22px 22px 22px 4px;
+  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(251, 251, 251, 0.92);
+}
+
+/* The agent's bubble, but only as wide as the words — the design has no
+   thinking state, and a full-width bar would read as an answer that had
+   arrived. */
+.aira-chat__bubble--thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 10px;
+  border-radius: 22px 22px 22px 4px;
+  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(251, 251, 251, 0.72);
+}
+
+.aira-chat__thinking-orb {
+  display: block;
+  flex-shrink: 0;
+}
+
+.aira-chat__hair {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+/* --- the suggestion the reader can send --- */
+
+.aira-chat__suggest {
+  padding: 6px 14px;
+  border: 0;
+  /* The design sets this one in SF Pro — the system face, so the system
+     stack is the honest substitute rather than the site's own. */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  color: #171717;
+  background-color: #ffffff;
+  border-radius: 16px 16px 16px 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.aira-chat__suggest:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.aira-chat__suggest:disabled {
+  cursor: default;
+}
+
+.aira-chat__suggest:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* --- back --- */
+
+/* The glass pill the chips and the CTA are cut from, sized off its own label
+   so it matches the button it replaced rather than the design's 18px — the
+   section's type came down by a quarter and this sits in that column. */
+.aira-chat__back {
+  padding: 0.667em 1.334em;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.12);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font: inherit;
+  font-weight: 400;
+  font-size: clamp(0.875rem, 1.04vw, 0.9375rem);
+  line-height: 1.4;
+  color: #fbfbfb;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 200ms ease;
+}
+
+.aira-chat__back:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.aira-chat__back:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* --- responsive --- */
+
+@media (max-width: 900px) {
+  .aira-chat {
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .aira-chat__panel {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .aira-chat__bubble {
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The staging stays — it is the content, not decoration — but nothing
+     slides, folds or fades to get there. */
+  .aira-chat,
+  .aira-chat__reveal,
+  .aira-chat__slot,
+  .aira-chat__reveal[data-exit],
+  .aira-chat__reveal[data-exit] .aira-chat__slot {
+    animation: none;
+  }
+
+  .aira-chat__reveal[data-exit] {
+    display: none;
+  }
+
+  .aira-chat__suggest:hover {
+    transform: none;
+  }
+
+  .aira-chat__log {
+    scroll-behavior: auto;
+  }
+}

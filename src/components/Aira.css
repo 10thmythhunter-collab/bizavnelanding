@@ -1,0 +1,478 @@
+/* The design draws this section a size larger than the rest of the site —
+   a 56px title against 40px everywhere else, and 24px body against 17-18px.
+   Everything below keeps the design's own ratios but reads them against the
+   site's scale instead: eyebrow 10, title 40, sub 16, body 18, controls 14-15.
+   That is the design's 24px body times 0.75, rounded to the sizes the other
+   sections already use.
+
+   Fluid values land on those at 1440px and scale from there rather than
+   stepping at breakpoints. */
+
+.aira {
+  position: relative;
+  padding-block: clamp(3rem, 5.56vw, 5rem) clamp(2rem, 3.89vw, 3.5rem);
+  /* The design's 140 left and 139 right — a pixel apart, which is a slip
+     rather than an intention, so both take the same value. */
+  padding-inline: clamp(1.5rem, 9.72vw, 8.75rem);
+  /* The image is the section's own; this is what shows through where it does
+     not reach, and what the veil below fades into. */
+  background-color: #000000;
+  overflow: hidden;
+}
+
+/* --- background --- */
+
+.aira__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.aira__bg-shader {
+  position: absolute;
+  inset: 0;
+}
+
+/* The design's own gradient over it: black at the foot, clear at the head,
+   which is what settles the section onto the white above it and the footer
+   below. */
+.aira__bg-veil {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to top, #000000, rgba(102, 102, 102, 0));
+}
+
+/* --- layout --- */
+
+.aira__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* The copy column flexes to fill, so this changes nothing for it — it is
+     the chat view that needs it: that column is fixed at the design's 558 and
+     without this the burst would slide in beside it instead of holding the
+     right edge it has in both designs. */
+  justify-content: space-between;
+  /* 97px at the design width, between a 575 column and a 489 one — the three
+     come to exactly the 1161 the padding leaves. */
+  gap: clamp(2rem, 6.74vw, 6.0625rem);
+  /* The copy no longer fills the burst's height now that the type is smaller,
+     so the row is as tall as the burst and the column centres in it. */
+  flex-wrap: wrap;
+  max-width: 1161px;
+  margin-inline: auto;
+}
+
+.aira__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(1.25rem, 1.94vw, 1.75rem);
+  flex: 1 1 24rem;
+  min-width: 0;
+}
+
+/* --- headline block --- */
+
+.aira__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  /* The design's own measure for this block, which is what puts the break in
+     the line below it. */
+  max-width: 391px;
+}
+
+.aira__eyebrow {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.625rem;
+  line-height: normal;
+  /* The same 0.1em the other two section eyebrows carry. */
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.aira__title {
+  margin: 0;
+  font-weight: 700;
+  /* 40px, the size the other section titles run at. */
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: normal;
+  /* The design's 9.8px at 56px, kept as a ratio — wide enough that the four
+     letters read as a mark rather than as a word. */
+  letter-spacing: 0.175em;
+  color: #ffffff;
+}
+
+.aira__sub {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(0.9375rem, 1.11vw, 1rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+}
+
+.aira__body {
+  margin: 0;
+  font-weight: 400;
+  /* 18px, the site's largest body size. */
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  text-wrap: pretty;
+}
+
+.aira__body strong {
+  font-weight: 700;
+}
+
+/* --- actions --- */
+
+.aira__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.aira__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  /* Asymmetric on purpose: a hair around the orb, and clearance past the
+     label, which is what centres the pair inside the pill. */
+  padding: 7px 26px 7px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  /* A pill whatever the type does to its height. */
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.12);
+  font: inherit;
+  font-weight: 400;
+  font-size: clamp(0.875rem, 1.04vw, 0.9375rem);
+  line-height: 1.4;
+  color: #fbfbfb;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 200ms ease;
+}
+
+.aira__cta:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.aira__cta:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* Sized in em off the label, so the pill's height follows the type: the
+   design's own ratio of 3.11 against its label, which here comes out near
+   47px. The still I replaced was a solid burst and had to come down to 2.6
+   to stop it shouting over the words; the live orb is sparse dots, so it
+   carries the design's ratio without doing that — and it needs the room,
+   since the package tunes its dot count and dot size for a 64px render
+   rather than scaling them, so displaying it much smaller than that thins
+   the dots towards sub-pixel.
+
+   The class lands on the component's own canvas, and the !important is the
+   package's own pattern for this: it writes width/height inline from its
+   size preset, so a plain rule would lose to it. */
+.aira__cta-orb {
+  display: block;
+  width: 3.11em !important;
+  height: 3.11em !important;
+  flex-shrink: 0;
+}
+
+/* The note and the badge read as one unit, so they sit closer to each other
+   than the actions column's own 20px rhythm puts them. */
+.aira__app {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* A caption rather than body copy: a step under the paragraph above it, and
+   dimmer, so it introduces the badge instead of competing with the pitch. */
+.aira__app-note {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(0.8125rem, 0.97vw, 0.875rem);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.aira__badge {
+  display: block;
+  border-radius: 8px;
+}
+
+.aira__badge img {
+  display: block;
+  /* The badge is Apple's artwork at 146px; 130 keeps it in step with the
+     smaller pill above it without going under their guidance. */
+  width: 130px;
+  height: auto;
+}
+
+.aira__badge:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* --- the burst and the labels orbiting it --- */
+
+.aira__orb {
+  position: relative;
+  /* The whole visual's size, as a factor of the design's 489x527 — the scene
+     fills this box, so this one number is the only thing to turn. Past 1.0
+     the burst is deliberately larger than the design has it, which is what
+     makes it the section's anchor rather than a peer of the copy. */
+  --aira-orb-scale: 0.9;
+  flex: 0 1 calc(489px * var(--aira-orb-scale));
+  /* Ratio rather than a height, so the box keeps the design's shape as the
+     column narrows. */
+  aspect-ratio: 489 / 527;
+  /* Centres it the moment it wraps onto a line of its own, and does nothing
+     at all while it shares one: auto margins only take free space that is
+     left after the flexible lengths resolve, and the copy beside it grows
+     into all of it (flex-grow: 1 above). Alone on a line, this box does not
+     grow — grow is 0 — so the line's whole remainder is free, and the two
+     auto margins split it. The row's own justify-content cannot do this:
+     space-between leaves a single item on a line at the start, which is
+     what left the burst hugging the left edge between 1110px, where it
+     wraps, and the 900px the old rule waited for. */
+  margin-inline: auto;
+  /* Not hidden: two of the labels reach past this box in the design, one of
+     them past the section's own right inset. */
+}
+
+/* Clips the oversized frame to the slot, so the scene cannot paint across
+   the copy column. The labels sit outside this, as direct children of the
+   slot, and so keep the overhang the design gives them. */
+.aira__orb-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Nothing in here is interactive. */
+  pointer-events: none;
+}
+
+/* The scene draws its mark across the middle 0.636 of its canvas width and
+   0.623 of its height, and it draws it 0.92% of the canvas width left of
+   centre — measured off a render with the backgrounds hidden and the clip
+   opened, stable from a threshold of 8 to 110. So the canvas is oversized and
+   centred, which lands the mark on the slot's own bounds; that is what makes
+   the labels' percentages — taken straight from the design, where the burst
+   filled its box — fall on the mark.
+
+   155% rather than 160: at 160 the mark came out 448 wide in a 440 slot and,
+   with the scene's own leftward bias on top of that, overhung the clip's left
+   edge by 10px — which the clip then sliced off as a flat vertical edge
+   through the blades. 155 leaves the mark 434 wide, a 3px margin each side.
+   The translate offset is what cancels the bias: a percentage there resolves
+   against the frame's own width, so it holds at any size. */
+.aira__orb-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 155%;
+  height: 155%;
+  transform: translate(calc(-50% + 0.92%), -50%);
+}
+
+/* The embed's own div is in flow inside the frame, which is what it should
+   be: it fills it. */
+.aira__orb-scene {
+  display: block;
+}
+
+.aira__label {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: clamp(2.25rem, 3.06vw, 2.75rem);
+  padding-inline: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.12);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-weight: 400;
+  font-size: clamp(0.8125rem, 0.97vw, 0.875rem);
+  line-height: 1.4;
+  color: #fbfbfb;
+  white-space: nowrap;
+  /* Duration and phase come from the chip's own data — see Aira.jsx. */
+  animation: aira-float var(--aira-float, 5.5s) ease-in-out
+    var(--aira-float-phase, 0s) infinite;
+}
+
+/* A percentage on translateY resolves against the chip's own height, so the
+   drift stays in proportion to the chip however the section scales. 22% of a
+   44px pill is about 10px. */
+@keyframes aira-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-22%);
+  }
+}
+
+/* --- the Owners page's own arrangement of this section --- */
+
+/* Node 215:21752 draws the same section stacked rather than side by side:
+   the copy centred at the top, the burst centred under it, and no actions
+   row at all (see the variant prop in Aira.jsx). Only the arrangement is
+   the variant's — the type scale, the burst and its chips stay the
+   brokers' own, so the two pages read as one section rather than two.
+
+   The design's own figures here: 64 above and 70 below, 32 between the
+   copy and the burst, 38 inside the copy, a 963 measure on the paragraph,
+   and the burst at its full 489 rather than the 0.9 it comes down to when
+   it has a column of copy to share the row with. */
+.aira--owners {
+  padding-block: clamp(2.5rem, 4.44vw, 4rem) clamp(2.5rem, 4.86vw, 4.375rem);
+}
+
+.aira--owners .aira__row {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.25rem, 2.22vw, 2rem);
+}
+
+.aira--owners .aira__copy {
+  /* flex-basis is the main axis, and the main axis is vertical now: the
+     row's own `flex: 1 1 24rem` would read as a height here. */
+  flex: 0 1 auto;
+  align-items: center;
+  gap: clamp(1.5rem, 2.64vw, 2.375rem);
+  text-align: center;
+}
+
+.aira--owners .aira__head {
+  align-items: center;
+}
+
+.aira--owners .aira__body {
+  max-width: clamp(20rem, 66.88vw, 60.1875rem);
+}
+
+.aira--owners .aira__orb {
+  --aira-orb-scale: 1;
+  flex: 0 0 auto;
+  width: calc(489px * var(--aira-orb-scale));
+  /* Two of the chips hang past this box by design; the box itself is what
+     has to stay inside the section. */
+  max-width: 100%;
+}
+
+/* --- the section arriving ---
+
+   Four beats, in the order the section reads: the ground opens out of the
+   top-left corner, the copy comes in from the left behind it, the burst
+   after that, then the chips one at a time down the orbit.
+
+   Keyed off data-reveal, which Aira.jsx writes onto the section on mount —
+   nothing here hides anything until the script that shows it again is
+   running, so a reader without JavaScript gets the section outright. "done"
+   is set once, on the first crossing, and never unset. */
+
+.aira[data-reveal] .aira__bg {
+  clip-path: circle(0% at 0% 0%);
+}
+
+.aira[data-reveal] .aira__copy {
+  opacity: 0;
+  transform: translateX(-28px);
+}
+
+.aira[data-reveal] .aira__orb {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.aira[data-reveal] .aira__label {
+  opacity: 0;
+}
+
+/* 150% rather than 100: the radius is measured to the corner it starts
+   from, and the far corner of a wide section is further than that. */
+.aira[data-reveal="done"] .aira__bg {
+  clip-path: circle(150% at 0% 0%);
+  transition: clip-path 1100ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.aira[data-reveal="done"] .aira__copy {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms ease 450ms,
+    transform 800ms cubic-bezier(0.16, 1, 0.3, 1) 450ms;
+}
+
+.aira[data-reveal="done"] .aira__orb {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms ease 950ms,
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1) 950ms;
+}
+
+/* Opacity only, and no transform: these carry the float animation, and an
+   animation wins over a transition on the same property — a transform here
+   would simply be ignored. Their own delay comes in from the markup, in the
+   order they hang on the orbit.
+
+   Slow on purpose, and well spaced: 420ms each, 320ms apart, so one chip
+   has all but finished before the next one starts and the four read as four
+   separate arrivals down the orbit rather than as one group fading up. */
+.aira[data-reveal="done"] .aira__label {
+  opacity: 1;
+  transition: opacity 420ms ease var(--aira-in, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The section is simply there. */
+  .aira[data-reveal] .aira__bg,
+  .aira[data-reveal] .aira__copy,
+  .aira[data-reveal] .aira__orb,
+  .aira[data-reveal] .aira__label {
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* --- responsive --- */
+
+/* The block that used to sit here centred the burst from 900px down. It is
+   gone because the auto inline margin on .aira__orb does that job from the
+   pixel it actually wraps at instead — see the comment there. Its other two
+   declarations were doing nothing either: the burst wraps on its own well
+   above 900px, and it shrinks rather than overflows below it. */
+
+@media (max-width: 560px) {
+  /* The labels are pinned to a box that is now narrow enough for them to
+     collide with each other and with the mark. */
+  .aira__label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aira__label {
+    animation: none;
+  }
+}

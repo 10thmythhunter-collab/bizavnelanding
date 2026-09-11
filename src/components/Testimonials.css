@@ -1,0 +1,156 @@
+/* Node 215:21029 — 900x248, centred in the page. Fluid values land on the
+   design's own numbers at 1440px. */
+
+.testimonials {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.5rem, 2.29vw, 2.0625rem);
+  padding-block: clamp(2.5rem, 4.79vw, 4.3125rem);
+  padding-inline: clamp(1.5rem, 2.78vw, 2.5rem);
+  background-color: #ffffff;
+}
+
+.testimonials__eyebrow {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: normal;
+  /* The design's 1.2px at 12px — the same 0.1em every other eyebrow on the
+     page carries. */
+  letter-spacing: 0.1em;
+  color: #0a0a0a;
+}
+
+/* --- the crossfade --- */
+
+/* All three slides share one grid cell, so the stage's own height follows
+   whichever is tallest instead of a fixed figure that would clip a longer
+   quote or leave a gap under a shorter one. */
+.testimonials__stage {
+  position: relative;
+  display: grid;
+  width: 100%;
+  /* The design's own 895px measure, which is what puts this quote's break
+     where it is; the others wrap to their own lines inside the same box. */
+  max-width: 895px;
+}
+
+.testimonials__slide {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.375rem, 1.15vw, 1.4375rem);
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms ease;
+}
+
+.testimonials__slide[data-active] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* --- the quote --- */
+
+.testimonials__quote {
+  margin: 0;
+  width: 100%;
+}
+
+.testimonials__quote p {
+  margin: 0;
+  /* The one serif on the page — the design's own choice for a pull-quote,
+     against IBM Plex Sans everywhere else. */
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.78vw, 2.5rem);
+  line-height: 1.35;
+  text-align: center;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  text-wrap: pretty;
+}
+
+/* --- the byline --- */
+
+.testimonials__byline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.testimonials__avatar {
+  display: block;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: cover;
+  background-color: #d9d9d9;
+}
+
+.testimonials__who {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.testimonials__name {
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  white-space: nowrap;
+}
+
+.testimonials__company {
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: rgba(10, 10, 10, 0.7);
+  white-space: nowrap;
+}
+
+/* --- page dots --- */
+
+.testimonials__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.testimonials__dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition:
+    width 300ms ease,
+    background-color 300ms ease;
+}
+
+.testimonials__dot[data-active] {
+  width: 18px;
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.testimonials__dot:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .testimonials__slide,
+  .testimonials__dot {
+    transition: none;
+  }
+}

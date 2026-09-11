@@ -1,0 +1,118 @@
+/* Node 215:21794's closing banner — a rounded card inset from the page over
+   a photograph of its own, rather than the full-bleed shader panel this
+   section used to be. The section itself is only the white around it and
+   the inset that holds it off the page's edges. */
+
+.owner-cta {
+  padding-inline: clamp(1rem, 2.78vw, 3.5rem);
+  background-color: #ffffff;
+}
+
+/* The design's own 1130x401 at 1440, rounded 24. min-height rather than a
+   fixed height: the design centres its copy in a box it drew at one width,
+   and a fixed height would clip that copy at every width it didn't. */
+.owner-cta__card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1130px;
+  min-height: clamp(16rem, 27.85vw, 25.0625rem);
+  margin-inline: auto;
+  padding: clamp(2rem, 3.33vw, 3rem) clamp(1.25rem, 3.06vw, 2.75rem);
+  border-radius: 24px;
+  /* Clips the photograph and the wash to the radius. */
+  overflow: hidden;
+  /* What the copy sits on until the photograph has loaded. */
+  background-color: #0a0a0a;
+}
+
+.owner-cta__photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.owner-cta__veil {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.38);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+/* position: relative is load-bearing: the photograph and the wash above are
+   both positioned boxes, and positioned boxes paint after every plain
+   static one in the same stacking context, whatever the markup order — so
+   without this the wash would cover the copy. */
+.owner-cta__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The design's own 16px. */
+  gap: 1rem;
+  text-align: center;
+}
+
+.owner-cta__title {
+  margin: 0;
+  font-weight: 500;
+  font-size: clamp(2rem, 3.89vw, 3.5rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+}
+
+.owner-cta__body {
+  margin: 0;
+  font-weight: 300;
+  font-size: 1.125rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+}
+
+.owner-cta__download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding-inline: 18px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  font: inherit;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.owner-cta__download-dot {
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #66e208;
+}
+
+.owner-cta__download-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.owner-cta__download:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}

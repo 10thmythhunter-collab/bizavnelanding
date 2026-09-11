@@ -1,0 +1,294 @@
+/* The three mockups are drawn at the design's 442px panel, in the pixels the
+   design gives them. The panel is fluid, so rather than repeat every value as
+   a percentage they hang off one anchor: this font-size is 10px at 442px, and
+   every measurement below is the design's px divided by ten, in em. Change
+   the panel's width and the whole mockup scales with it.
+
+   cqw needs a container, which .products__preview declares. */
+.preview {
+  position: absolute;
+  inset: 0;
+  font-size: 2.2624cqw;
+  /* IBM Plex Sans is the site's; the design draws these two in Archivo and
+     SF Pro, which are the Terminal product's own faces. Substituted rather
+     than loaded — two more families for a hover flourish is not a trade
+     worth making. */
+  font-family: inherit;
+  line-height: normal;
+  letter-spacing: normal;
+}
+
+/* --- shared --- */
+
+.preview__panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.preview__rule {
+  width: 100%;
+  height: 0.1em;
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* --- 1. Terminal side menu --- */
+
+.preview__panel--menu {
+  top: 3em;
+  left: 8.1em;
+  width: 28em;
+  height: 46.3em;
+  gap: 0.4em;
+  padding: 2.4em 1.6em;
+  border: 0.1em solid rgba(255, 255, 255, 0.08);
+  border-radius: 2.4em;
+  background-color: rgba(0, 0, 0, 0.46);
+  -webkit-backdrop-filter: blur(3.4em);
+  backdrop-filter: blur(3.4em);
+}
+
+.preview__menu-logo {
+  display: flex;
+  width: 100%;
+  padding: 0.4em 0 1.6em 1.2em;
+  flex-shrink: 0;
+}
+
+.preview__menu-logo img {
+  display: block;
+  width: 20.4em;
+  height: 4.6em;
+}
+
+/* The design closes the menu on a green rule rather than the white one it
+   opens with. */
+.preview__rule--foot {
+  background-color: #1e2e22;
+}
+
+.preview__toggle-wrap {
+  width: 100%;
+  padding: 0.8em 0 1.2em;
+  flex-shrink: 0;
+}
+
+.preview__toggle {
+  display: flex;
+  align-items: center;
+  padding: 0.3em;
+  border-radius: 1em;
+  background-color: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.preview__seg {
+  display: flex;
+  flex: 1 0 0;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding-block: 0.7em;
+  border-radius: 0.8em;
+  font-weight: 500;
+  font-size: 1.3em;
+  color: #b5b5b5;
+  white-space: nowrap;
+}
+
+.preview__seg--on {
+  border: 0.1em solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Sized in em off the segment's own label rather than the root, which is the
+   relationship the design has. */
+.preview__seg-icon {
+  display: block;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+.preview__row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 1.2em;
+  padding: 0.9em 1.2em;
+  border-radius: 1em;
+  flex-shrink: 0;
+  font-weight: 500;
+  font-size: 1.5em;
+  color: #b5b5b5;
+  white-space: nowrap;
+}
+
+.preview__row--on {
+  background-color: rgba(255, 255, 255, 0.05);
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Both of these are em off the row's label, so the icon column lines up
+   whatever the row's state. */
+.preview__row-icon {
+  display: block;
+  width: 1.3333em;
+  height: 1.3333em;
+  flex-shrink: 0;
+}
+
+.preview__row-tile {
+  display: flex;
+  width: 1.7333em;
+  height: 1.7333em;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4667em;
+  background-color: #a3e635;
+  overflow: hidden;
+}
+
+.preview__row-tile img {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
+
+/* --- 2. Aira chat --- */
+
+/* The design's own gap is 2em and its panel comes out about 488 tall in a
+   523 panel. The browser wraps the agent's reply to six lines where Figma
+   fits five — same size, different metrics — so the rhythm has to absorb the
+   extra line rather than let the suggestion pill clip off the bottom. */
+.preview__panel--chat {
+  top: 2.4em;
+  left: 7.7em;
+  width: 28.9em;
+  gap: 1.3em;
+  padding: 2.4em;
+  border: 0.1em solid rgba(255, 255, 255, 0.16);
+  border-radius: 2.8em;
+  background-color: rgba(0, 0, 0, 0.32);
+  -webkit-backdrop-filter: blur(3.8em);
+  backdrop-filter: blur(3.8em);
+  overflow: hidden;
+}
+
+.preview__chat-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.preview__chat-who {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-weight: 500;
+  font-size: 1.7em;
+  line-height: 1.4706;
+  color: #fbfbfb;
+  white-space: nowrap;
+}
+
+/* The burst is wider than its box in the design and cropped to it. */
+.preview__chat-avatar {
+  display: block;
+  width: 1.2941em;
+  height: 1.4118em;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.preview__chat-status {
+  font-weight: 400;
+  font-size: 1.2em;
+  line-height: 1.4167;
+  color: rgba(251, 251, 251, 0.55);
+  white-space: nowrap;
+}
+
+.preview__rule--chat {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.preview__bubble {
+  margin: 0;
+  flex-shrink: 0;
+  padding: 1.1em 2em;
+  border: 0.1em solid;
+  font-weight: 400;
+  font-size: 1.6em;
+  line-height: 1.4375;
+}
+
+/* The square corner marks who is speaking: bottom-right for the person,
+   bottom-left for the agent. */
+.preview__bubble--user {
+  align-self: stretch;
+  border-radius: 1.375em 1.375em 0.25em 1.375em;
+  border-color: rgba(255, 255, 255, 0.14);
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fbfbfb;
+  -webkit-backdrop-filter: blur(1.375em);
+  backdrop-filter: blur(1.375em);
+}
+
+.preview__bubble--ai {
+  align-self: stretch;
+  border-radius: 1.375em 1.375em 1.375em 0.25em;
+  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(251, 251, 251, 0.92);
+  -webkit-backdrop-filter: blur(1.375em);
+  backdrop-filter: blur(1.375em);
+}
+
+.preview__chat-line {
+  display: block;
+  width: 100%;
+  height: 0.1em;
+  flex-shrink: 0;
+}
+
+.preview__chat-suggest {
+  flex-shrink: 0;
+  padding: 0.6em 1.4em;
+  /* The design sets this one in SF Pro — the system face, so the system
+     stack is the honest substitute rather than the site's own. */
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 1.3em;
+  line-height: 1.5385;
+  letter-spacing: -0.01em;
+  color: #171717;
+  background-color: #ffffff;
+  border-radius: 1.2308em 1.2308em 1.2308em 0.3077em;
+  white-space: nowrap;
+}
+
+/* --- 3. Signals aircraft cards --- */
+
+/* The cards themselves are AircraftCard, measured in em off this root's own
+   font-size — see AircraftCard.css. Only the stack is this panel's business. */
+.preview__panel--signals {
+  top: 8.3em;
+  left: 4.8em;
+  width: 35em;
+  gap: 1.1em;
+}
+
+.preview__panel--signals .tail {
+  width: 100%;
+  flex-shrink: 0;
+}

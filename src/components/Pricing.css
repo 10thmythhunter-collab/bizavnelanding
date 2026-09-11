@@ -1,0 +1,234 @@
+/* Node 215:20884 — 1280x458 inside a 1440-wide frame. Fluid values land on
+   the design's own numbers at 1440px.
+
+   Colours here are the design's own, as authored — not adapted to the rest
+   of the site's palette. */
+
+.pricing {
+  padding-block: clamp(2.5rem, 4.79vw, 4.3125rem) clamp(4rem, 8.4vw, 7.5625rem);
+  padding-inline: clamp(1.5rem, 5.56vw, 5rem);
+  background-color: #ffffff;
+}
+
+/* --- header --- */
+
+.pricing__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.pricing__eyebrow {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: normal;
+  /* The design's 1.2px at 12px — the same 0.1em every other eyebrow on the
+     page carries. */
+  letter-spacing: 0.1em;
+  color: #0a0a0a;
+}
+
+.pricing__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
+
+/* --- cards --- */
+
+.pricing__cards {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  flex-wrap: wrap;
+  max-width: 1280px;
+  margin: 2.5rem auto 0;
+}
+
+.pricing__card {
+  display: flex;
+  flex: 1 1 20rem;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* The design's own callout: a blue ring and a pale blue wash on the
+   Enterprise card. */
+.pricing__card[data-featured] {
+  border: 2px solid #3b82f6;
+  background-color: #eff6ff;
+}
+
+.pricing__card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1.5rem 1.5rem 0.5rem;
+}
+
+.pricing__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
+.pricing__plan {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.875rem;
+  line-height: 1.2;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.pricing__badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: #3b82f6;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.4286;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.pricing__description {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.4286;
+  color: #4b5563;
+}
+
+.pricing__card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* --- the call to action --- */
+
+.pricing__cta {
+  padding-block: 1rem;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1.4;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.pricing__cta--outline {
+  border: 1px solid #404040;
+  background-color: #525252;
+  box-shadow: 0 10px 15px -3px rgba(23, 23, 23, 0.35);
+}
+
+.pricing__cta--outline:hover {
+  background-color: #404040;
+}
+
+.pricing__cta--solid {
+  border: 1px solid #60a5fa;
+  background-color: #2563eb;
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5);
+}
+
+.pricing__cta--solid:hover {
+  background-color: #1d4ed8;
+}
+
+.pricing__cta:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* --- the checklist --- */
+
+.pricing__includes {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e5e5;
+  margin-top: 1rem;
+}
+
+.pricing__includes-label {
+  margin: 0;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #111827;
+}
+
+.pricing__list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pricing__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.4286;
+  color: #4b5563;
+}
+
+/* The design's own check: a pale mint circle, a blue ring, a blue glyph. */
+.pricing__check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: 1px solid #3b82f6;
+  border-radius: 999px;
+  background-color: #f0fdf4;
+}
+
+.pricing__check img {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+/* --- responsive --- */
+
+@media (max-width: 720px) {
+  .pricing__cards {
+    flex-wrap: wrap;
+  }
+
+  .pricing__card {
+    flex-basis: 100%;
+  }
+}

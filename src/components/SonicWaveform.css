@@ -1,0 +1,6 @@
+/* Only what the canvas itself needs. The box comes from whoever places it —
+   two classes both setting height would leave the winner to stylesheet
+   order, and the canvas reads its own box to size the drawing buffer. */
+.sonic-waveform {
+  display: block;
+}

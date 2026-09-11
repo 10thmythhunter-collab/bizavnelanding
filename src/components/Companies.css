@@ -1,0 +1,109 @@
+/* Fluid values land on the Figma spec at 1440px (40px/70px padding, 28px
+   title, 40px gap, 64px radius) and scale from there instead of stepping. */
+
+.companies {
+  padding-block: clamp(2rem, 2.78vw, 2.5rem) clamp(2.5rem, 4.86vw, 4.375rem);
+  padding-inline: clamp(1.5rem, 2.78vw, 3.5rem);
+  /* Only the bottom corners curve — the section butts straight up against
+     the hero above it. */
+  border-end-start-radius: clamp(2rem, 4.44vw, 4rem);
+  border-end-end-radius: clamp(2rem, 4.44vw, 4rem);
+  background-color: #f5f5f5;
+}
+
+.companies__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.75rem, 2.78vw, 2.5rem);
+}
+
+.companies__title {
+  margin: 0;
+  /* The design's 286px side padding is just this column centred. It caps the
+     copy only: the logo row below needs to be wider than the measure to have
+     any air between the logos. */
+  max-width: 868px;
+  font-weight: 500;
+  font-size: clamp(1.25rem, 1.94vw, 1.75rem);
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  text-align: center;
+}
+
+.companies__title span {
+  display: block;
+}
+
+/* Narrow enough that the two-line break stops helping — let it wrap on its
+   own and balance whatever lines come out. */
+@media (max-width: 560px) {
+  .companies__title span {
+    display: inline;
+  }
+
+  .companies__title {
+    text-wrap: balance;
+  }
+}
+
+.companies__logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 64px at the design width — roughly a third of a logo, which is what
+     stops four wordmarks of the same brand reading as one run of text. The
+     floor is the old 24px, for the narrow widths where the row wraps. */
+  gap: clamp(2rem, 4.44vw, 4rem);
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* One place to tune the effect below. Enough to read as out of focus at
+     the logos' ~200px width without turning them into shapeless smears. */
+  --companies-blur: 4px;
+}
+
+.companies__logo {
+  display: block;
+  width: clamp(8.75rem, 13.82vw, 12.4375rem);
+  height: auto;
+  /* No href on these yet, but they read as the thing you are pointing at
+     the moment the rest of the row falls out of focus — so the cursor has
+     to agree with that. */
+  cursor: pointer;
+  /* Declared at rest rather than left as `none`, so both directions
+     interpolate from a real blur radius instead of from the identity. */
+  filter: blur(0);
+  transition: filter 400ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+/* --- hover: the row falls out of focus around the logo being read ---
+
+   Keyed off :has(li:hover) rather than the list's own :hover, because the
+   list box includes the gaps between the logos — hovering one of those
+   would blur all four with nothing left sharp to look at.
+
+   Scoped to real pointers: on touch, :hover latches after a tap and would
+   leave three logos blurred with no way to clear it. */
+
+@media (hover: hover) {
+  .companies__logos:has(li:hover) .companies__logo {
+    filter: blur(var(--companies-blur));
+  }
+
+  /* Same specificity as the rule above and deliberately after it, which is
+     what keeps the logo under the pointer sharp. */
+  .companies__logos li:hover .companies__logo {
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The effect stays — it is what tells you which logo you are on. Only the
+     ramp into it goes. */
+  .companies__logo {
+    transition: none;
+  }
+}

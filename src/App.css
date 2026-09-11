@@ -1,0 +1,30 @@
+/* The rest of the page, below the hero — hidden while the audience switch
+   reads Owners, since that view is Hero-only for now. Always mounted (see
+   the comment in App.jsx); this is purely what "hidden" means for it.
+
+   Opacity only, on purpose: a max-height transition down to 0 was the first
+   version, and it does not animate proportionally to a fixed duration the
+   way opacity does — the box stays at its starting height for most of the
+   transition-duration and only visibly collapses right at the end, since
+   the timing function runs against the huge px range rather than against
+   the page's own real height. Fading it in place, still scrollable while it
+   does, is the honest version of "for a start" rather than a collapse that
+   would have looked broken. */
+.app__rest,
+.app__owners {
+  opacity: 1;
+  transition: opacity 400ms ease;
+}
+
+.app__rest--hidden,
+.app__owners--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app__rest,
+  .app__owners {
+    transition: none;
+  }
+}

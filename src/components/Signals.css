@@ -1,0 +1,214 @@
+/* Node 205:19412 — 1440x677, a black band with the waveform running through
+   the middle of it. Fluid values land on the design's numbers at 1440.
+
+   The design's own measurements, for the arithmetic below: the wave band is
+   1440x455 at y=115, the type block starts at y=152, the cards sit at y=458
+   and are 112 tall, and the section ends 107 past them. */
+
+.signals {
+  position: relative;
+  padding-block: clamp(3.5rem, 10.56vw, 9.5rem) clamp(3rem, 7.43vw, 6.6875rem);
+  /* The site's own 140 inset. The cards' 155 comes from their max-width
+     centring inside it, not from a second value. */
+  padding-inline: clamp(1.5rem, 9.72vw, 8.75rem);
+  background-color: #000000;
+  /* The wave runs the full width and is cut by the section's edges. */
+  overflow: hidden;
+}
+
+/* --- the waveform band --- */
+
+/* Percentages of the section's own height rather than a fixed 455: 17% and
+   15.8% of 677 are the design's 115 and 107, and read as proportions when
+   the copy wraps to another line and the section grows. */
+.signals__wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 16.99%;
+  bottom: 15.8%;
+  overflow: hidden;
+}
+
+/* A canvas is a replaced element: with only top and bottom set it would take
+   its intrinsic size and feed that back into layout, so the box it should
+   fill has to be stated. */
+.signals__wave-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* --- content --- */
+
+.signals__inner {
+  /* Above the wave, and the reason the wave keeps its pointer pull only in
+     the open space around the type. */
+  position: relative;
+}
+
+.signals__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  /* The design's 912. It sits 19px left of centre there, which is a slip
+     rather than an intention, so this is centred. */
+  max-width: 57rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.signals__eyebrow {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: normal;
+  /* The same 0.1em the other section eyebrows carry. */
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* Regular, not the 700 the other section titles run at — that is what the
+   design sets here, and at this size it is what keeps the claim quiet enough
+   to read as an observation rather than a headline. */
+.signals__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+}
+
+.signals__title span {
+  display: block;
+}
+
+.signals__body {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(0.9375rem, 1.11vw, 1rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  text-wrap: pretty;
+}
+
+/* --- the three tails --- */
+
+/* 1130 inside the section's 1160 puts the row at the design's 155 from each
+   edge. The font-size is the cards' whole scale — AircraftCard is measured in
+   em at one em per ten design pixels, so 10px draws it at 360x112. */
+.signals__cards {
+  display: flex;
+  align-items: center;
+  gap: 2.4em;
+  max-width: 1130px;
+  /* 91px at the design width, between the copy and the cards. */
+  margin: clamp(2.5rem, 6.32vw, 5.6875rem) auto 0;
+  font-size: 10px;
+}
+
+/* The wrapper is the flex child now — each card is wrapped so the arrival
+   below has something to animate that is not the shared card itself. */
+.signals__card {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+/* --- the section arriving ---
+
+   Four beats, in the order it reads: the wave opens out of the bottom-right
+   corner, the title comes in, the copy under it, then the three tails one at
+   a time.
+
+   Keyed off data-reveal, which Signals.jsx writes onto the section on mount
+   — nothing here hides anything until the script that shows it again is
+   running, so a reader without JavaScript gets the section outright. "done"
+   is set once, on the first crossing, and never unset. */
+
+.signals[data-reveal] .signals__wave {
+  clip-path: circle(0% at 100% 100%);
+}
+
+.signals[data-reveal] .signals__eyebrow,
+.signals[data-reveal] .signals__title,
+.signals[data-reveal] .signals__body,
+.signals[data-reveal] .signals__card {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+/* 150% rather than 100: the radius is measured from the corner it starts
+   at, and the far corner of a wide band is further away than that. */
+.signals[data-reveal="done"] .signals__wave {
+  clip-path: circle(150% at 100% 100%);
+  transition: clip-path 1100ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+/* The label belongs to the title it sits over, so the two arrive together. */
+.signals[data-reveal="done"] .signals__eyebrow,
+.signals[data-reveal="done"] .signals__title {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms ease 450ms,
+    transform 800ms cubic-bezier(0.16, 1, 0.3, 1) 450ms;
+}
+
+.signals[data-reveal="done"] .signals__body {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms ease 800ms,
+    transform 800ms cubic-bezier(0.16, 1, 0.3, 1) 800ms;
+}
+
+/* Well spaced, so one tail has all but landed before the next starts and
+   the three read as three arrivals rather than one row fading up. Each
+   card's own delay comes in from the markup. */
+.signals[data-reveal="done"] .signals__card {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 420ms ease var(--signals-in, 0ms),
+    transform 520ms cubic-bezier(0.16, 1, 0.3, 1) var(--signals-in, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The section is simply there. */
+  .signals[data-reveal] .signals__wave,
+  .signals[data-reveal] .signals__eyebrow,
+  .signals[data-reveal] .signals__title,
+  .signals[data-reveal] .signals__body,
+  .signals[data-reveal] .signals__card {
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* --- responsive --- */
+
+@media (max-width: 900px) {
+  /* Three 148px media columns plus their type stop fitting across; stacked,
+     each card keeps the design's proportions instead of squeezing the name
+     into an ellipsis. */
+  .signals__cards {
+    flex-wrap: wrap;
+  }
+
+  .signals__card {
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 620px) {
+  /* The design's break belongs to a line that fits; below this the title
+     reads as one sentence and wraps where it needs to. */
+  .signals__title span {
+    display: inline;
+  }
+}

@@ -1,0 +1,109 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    "IBM Plex Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-variation-settings: "wdth" 100;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #08060d;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+/* --- rhythm between sections ---
+   Each section's own padding-block is sized off its own Figma frame, and
+   those frames were never laid out as one continuous page — stacked with
+   nothing between them, most of the site read as one uninterrupted sheet:
+   two consecutive white sections (or two black ones, Aira into Signals)
+   share an edge with no seam at all, and even a colour change on its own is
+   a hard cut rather than a pause. This is what gives every section a beat
+   of plain space on both sides of that seam before its own padding starts,
+   so a reader's eye gets a place to land between one section's close and
+   the next one's opening line — the gap "most landing pages have" that was
+   asked for.
+
+   A margin rather than more padding on each section: padding is that
+   section's own internal spacing, tuned to its own content; this is a
+   property of the page's layout, so it belongs to the boundary between
+   sections rather than to either one. The universal selector below is safe
+   because every top-level section here is a bare <section> or <footer>
+   with no nested one — confirmed, not assumed — so it can only ever match
+   at the page's own seams. */
+section + section,
+section + footer {
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+/* Aira into Signals is the one boundary where the margin looks wrong rather
+   than restful: the gap is the body's own white, so it cuts a pale stripe
+   between two sections that are both already black, and a reader sees that
+   as a rendering seam rather than a paced beat. Every other same-colour
+   run in the page is white into white, where that same margin is invisible
+   against the page and simply reads as room. Flush here is what keeps
+   those two reading as one dark block instead of two with a stray gap
+   between them. */
+.aira + .signals {
+  margin-top: 0;
+}
+
+/* Hero into Companies is a deliberate join, not an accidental one: only
+   Companies' bottom corners are rounded — see its own comment — because the
+   design has it sitting flush against the hero above, the pale panel
+   overlapping the video's own lower edge. The universal gap would put a
+   band of plain white between the video and that panel, cutting apart a
+   seam the design draws as one continuous piece.
+
+   Reaches through .app__rest rather than a bare `.hero + .companies`: the
+   audience switch's Owners view wraps everything past the hero in that div
+   so the whole block can fade as one (see App.jsx), which puts it, not
+   Companies, directly after the hero in the DOM. */
+.hero + .app__rest > .companies {
+  margin-top: 0;
+}
+
+/* The bar's own in-page links. Both rules below are page-level rather than
+   any one section's: they exist because the bar is fixed and about 70px
+   tall, which is a property of the page, not of the sections landed on. */
+
+/* Without this the jump lands a section's top edge at the viewport's, which
+   puts its first line under the glass. scroll-margin is taken off the jump
+   itself rather than adding anything to the section's own box. */
+#terminal,
+#aira,
+#signals,
+#vision,
+#owners-about,
+#owners-how,
+#owners-aira,
+#owners-audience {
+  scroll-margin-top: 5.5rem;
+}
+
+/* Glide rather than cut, for the jumps those links make — and only for
+   whoever has not asked their system for less motion. Nothing else on the
+   page scrolls the document programmatically; the chat log inside Aira
+   scrolls itself, and carries its own rule for this. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

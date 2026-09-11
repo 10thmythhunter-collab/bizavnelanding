@@ -1,0 +1,346 @@
+import { memo, useEffect, useRef, useState } from "react";
+import leftUrl from "../assets/blueprint-left.svg";
+import rightUrl from "../assets/blueprint-right.svg";
+import lockup from "../assets/bizavLockup.svg";
+import heroPoster from "../assets/hero-skyline.jpg";
+import plane from "../assets/plane-progress.svg";
+import "./Loading.css";
+
+// The first line is the design's; the rest carry the same voice. The bar is
+// divided evenly between them, so adding or removing one is all it takes to
+// re-time the sequence.
+const messages = [
+  "Getting things ready…",
+  "Syncing 1.5B datapoints…",
+  "Clearing you for takeoff…",
+];
+
+// The load: the bar does not creep, it reports. It moves to a third, waits,
+// moves to two thirds, waits, then finishes — one step per message below it.
+// The three drawings are laid down across exactly that span, so the pen and
+// the bar finish together.
+const STEPS = 3;
+const STEP_MS = 400;
+const STEP_HOLD_MS = 600;
+// It is full the moment the last of those moves lands, so the wait that would
+// have followed never happens — and counting it in would leave the drawings
+// six hundred milliseconds short of the bar they are timed against.
+const LOAD_MS = (STEPS - 1) * (STEP_MS + STEP_HOLD_MS) + STEP_MS;
+
+// Ease each step in and out of its own move; the pauses carry the rhythm, but
+// starting and stopping dead reads as a stutter rather than a beat.
+function smooth(t) {
+  return t * t * (3 - 2 * t);
+}
+
+// How long a single line of a drawing takes to land. The gap between one step
+// of a sweep and the next is whatever is left of the load divided between them.
+const LINE_MS = 400;
+
+// The drawings are inlined rather than dropped in an <img> so their several
+// hundred paths can be animated one at a time. Fetched rather than imported,
+// which would put 280KB of markup in the bundle ahead of the first paint —
+// and the screen cannot start until they are here, because they are the
+// screen.
+//
+// Both sweep outward from the copy in the middle, together, over the bar's own
+// span — so the pen and the bar finish on the same beat.
+const blueprints = [
+  { name: "left", url: leftUrl, at: 0, drawMs: LOAD_MS },
+  { name: "right", url: rightUrl, at: 0, drawMs: LOAD_MS },
+];
+
+// The screen stands finished once the bar fills — drawings whole, nothing
+// moving — before anything starts to leave.
+const FULL_HOLD_MS = 2000;
+
+// The exit, after that. The drawings retreat the way they came while
+// everything but the logo softens out of focus; only then does the logo walk
+// to the middle, stand for a beat, and the frame dive into the "a" of .ai
+// until nothing but ink is left.
+const UNDRAW_MS = 1600;
+const VANISH_MS = 600;
+const LIFT_AT = UNDRAW_MS;
+const LIFT_MS = 450;
+// Long enough to read as a stop rather than a bounce, and no longer.
+const CENTRE_HOLD_MS = 900;
+const ZOOM_AT = LIFT_AT + LIFT_MS + CENTRE_HOLD_MS;
+const ZOOM_MS = 600;
+// The dive can only carry the ink so far; the rest of the black comes in
+// under cover of its second half, landing with it.
+const BLACK_AT = ZOOM_AT + ZOOM_MS / 2;
+const BLACK_MS = ZOOM_MS / 2;
+const BLACK_HOLD_MS = 200;
+const EXIT_MS = BLACK_AT + BLACK_MS + BLACK_HOLD_MS;
+
+// The site is already painted black behind the loader by then; this is only
+// the last of the cover coming off.
+const HANDOVER_MS = 400;
+
+// Read once, when the markup lands: every path carries its place in the
+// drawing's own sweep, so the last place is how many steps that sweep has —
+// several paths can share one.
+function sweepSteps(markup) {
+  return Math.max(...Array.from(markup.matchAll(/--i:(\d+)/g), (m) => +m[1]));
+}
+
+// Memoised, and on primitives only, because the bar re-renders its parent on
+// every frame of the load: React 19 compares dangerouslySetInnerHTML by object
+// identity, and a fresh {__html} each render has it re-parse the drawing —
+// which replaces every path with a new element and restarts every line's
+// animation, sixty times a second. Nothing here depends on the progress, so
+// the cheapest fix is for it never to re-render at all.
+const Blueprint = memo(function Blueprint({ name, url, markup, steps, at, drawMs }) {
+  const style = {
+    "--steps": steps,
+    // Spread whatever each window has left over those steps and that is the
+    // pace. Kept on the drawing rather than the screen so the three never have
+    // to share a clock.
+    "--draw-at": `${at}ms`,
+    "--line-step": `${(drawMs - LINE_MS) / steps}ms`,
+    // They all leave together, so this one is the same for each of them.
+    "--undraw-step": `${(UNDRAW_MS - LINE_MS) / steps}ms`,
+  };
+  const className = `loading__blueprint loading__blueprint--${name}`;
+
+  return markup ? (
+    <div
+      className={className}
+      style={style}
+      aria-hidden="true"
+      // Our own build asset, tagged by the script that produced it.
+      dangerouslySetInnerHTML={{ __html: markup }}
+    />
+  ) : (
+    // The fetch is allowed to fail; the screen still needs its drawings.
+    <img className={className} style={style} src={url} alt="" />
+  );
+});
+
+function preload(src) {
+  const image = new Image();
+  image.src = src;
+  return image.decode
+    ? image.decode()
+    : new Promise((resolve) => {
+        image.onload = resolve;
+        image.onerror = resolve;
+      });
+}
+
+function Loading({ onDone, onExited }) {
+  const [progress, setProgress] = useState(0);
+  const [drawings, setDrawings] = useState(null);
+  const [stage, setStage] = useState("waiting");
+  const [focus, setFocus] = useState({ dx: 0, dy: 0 });
+  const [leaving, setLeaving] = useState(false);
+  const lockupRef = useRef(null);
+
+  // Nothing can be shown until the drawings are here — they are most of what
+  // there is to show, and starting the bar without them would have the pen
+  // join a sweep already in progress. The hero's first frame is fetched
+  // alongside but does not hold the screen up: the sequence runs for seven
+  // seconds after this, which is all the head start it needs.
+  useEffect(() => {
+    let live = true;
+    preload(heroPoster);
+    Promise.all(
+      blueprints.map(({ name, url }) =>
+        fetch(url)
+          .then((response) => response.text())
+          .then((markup) => [name, markup]),
+      ),
+    )
+      // A broken or slow asset must not strand the loader: the screen still
+      // owes the site a handover.
+      .catch(() => [])
+      .then((pairs) => {
+        if (!live) return;
+        setDrawings(
+          Object.fromEntries(
+            pairs.map(([name, markup]) => [
+              name,
+              { markup, steps: sweepSteps(markup) },
+            ]),
+          ),
+        );
+        setStage("load");
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (stage !== "load") return;
+
+    let frame;
+    let start;
+
+    const tick = (now) => {
+      start ??= now;
+      const elapsed = now - start;
+      const cycle = STEP_MS + STEP_HOLD_MS;
+      const step = Math.min(STEPS - 1, Math.floor(elapsed / cycle));
+      const within = Math.min(
+        1,
+        Math.max(0, (elapsed - step * cycle) / STEP_MS),
+      );
+      const value = (step + smooth(within)) / STEPS;
+      setProgress(value);
+
+      if (value < 1) {
+        frame = requestAnimationFrame(tick);
+        return;
+      }
+      setStage("full");
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [stage]);
+
+  useEffect(() => {
+    if (stage !== "full") return;
+    const id = setTimeout(() => {
+      // Measured at the end of the hold rather than the start of it, and in
+      // the same breath as the stage: the offsets and the stage land in the
+      // same render, so the walk can never start a frame early with nowhere
+      // to walk to.
+      const box = lockupRef.current.getBoundingClientRect();
+      setFocus({
+        dx: window.innerWidth / 2 - (box.left + box.width / 2),
+        dy: window.innerHeight / 2 - (box.top + box.height / 2),
+      });
+      setStage("exit");
+    }, FULL_HOLD_MS);
+    return () => clearTimeout(id);
+  }, [stage]);
+
+  useEffect(() => {
+    if (stage !== "exit") return;
+    const id = setTimeout(() => {
+      // Mounting the site and starting the fade in the same breath: the site
+      // gets the length of the fade to paint its first frame behind a screen
+      // that is still opaque.
+      setLeaving(true);
+      onDone();
+    }, EXIT_MS);
+    return () => clearTimeout(id);
+  }, [stage, onDone]);
+
+  useEffect(() => {
+    if (!leaving) return;
+    const id = setTimeout(onExited, HANDOVER_MS);
+    return () => clearTimeout(id);
+  }, [leaving, onExited]);
+
+  // The messages advance with the bar rather than on a clock of their own,
+  // so the last one is always the one on screen when it fills.
+  const active = Math.min(
+    messages.length - 1,
+    Math.floor(progress * messages.length),
+  );
+
+  return (
+    <div
+      className="loading"
+      data-stage={stage}
+      data-leaving={leaving ? "" : undefined}
+      style={{
+        "--line-ms": `${LINE_MS}ms`,
+        // Only the reduced-motion fallback reads these two: it swaps the
+        // hundreds of per-line fades for one per drawing, and still has to
+        // fill the same two windows.
+        "--load-ms": `${LOAD_MS}ms`,
+        "--undraw-ms": `${UNDRAW_MS}ms`,
+        "--vanish-ms": `${VANISH_MS}ms`,
+        "--lift-at": `${LIFT_AT}ms`,
+        "--lift-ms": `${LIFT_MS}ms`,
+        "--zoom-at": `${ZOOM_AT}ms`,
+        "--zoom-ms": `${ZOOM_MS}ms`,
+        "--black-at": `${BLACK_AT}ms`,
+        "--black-ms": `${BLACK_MS}ms`,
+        "--dx": `${focus.dx}px`,
+        "--dy": `${focus.dy}px`,
+      }}
+      aria-busy={!leaving}
+    >
+      {drawings &&
+        blueprints.map(({ name, url, at, drawMs }) => (
+          <Blueprint
+            key={name}
+            name={name}
+            url={url}
+            at={at}
+            drawMs={drawMs}
+            markup={drawings[name]?.markup}
+            steps={drawings[name]?.steps ?? 1}
+          />
+        ))}
+
+      <div className="loading__copy">
+        {/* The one thing that survives the exit, so it is a sibling of
+            everything else rather than set among it. */}
+        <img
+          className="loading__lockup"
+          ref={lockupRef}
+          src={lockup}
+          alt="bizav.ai"
+        />
+
+        <p className="loading__headline">
+          {/* Broken by hand: where the line turns is the design's, not
+              whatever the measure happens to allow. */}
+          <span className="loading__line">Platform for all</span>
+          <span className="loading__line">workflows</span>
+        </p>
+
+        {/* --progress lives here rather than on the screen: it changes every
+            frame, and an ancestor's custom property invalidates the style of
+            everything under it — which would be all seven hundred lines of the
+            drawings, sixty times a second. */}
+        <div className="loading__group" style={{ "--progress": progress }}>
+          <div
+            className="loading__bar"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(progress * 100)}
+            aria-label="Loading bizav.ai"
+          >
+            <div className="loading__track">
+              <div className="loading__fill" />
+            </div>
+            <img className="loading__plane" src={plane} alt="" />
+          </div>
+
+          <p className="loading__status" role="status">
+            {messages.map((message, index) => (
+              <span
+                className="loading__message"
+                key={message}
+                data-slot={
+                  index === active
+                    ? "current"
+                    : index < active
+                      ? "past"
+                      : "next"
+                }
+                // Only the line on screen belongs in the live region; the
+                // others would all be read out at once.
+                aria-hidden={index === active ? undefined : true}
+              >
+                {message}
+              </span>
+            ))}
+          </p>
+        </div>
+      </div>
+
+      {stage === "exit" && <div className="loading__ink" />}
+    </div>
+  );
+}
+
+export default Loading;

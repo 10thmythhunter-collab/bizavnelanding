@@ -1,0 +1,90 @@
+/* Node 215:21303's "Who it's for?" row — five outline cards on the same
+   recipe SignalMetrics.css uses: a border, a floor-pinned body, content
+   deciding the height rather than the design's own fixed 280px. */
+
+.owner-audience {
+  padding-block: clamp(2.5rem, 4.44vw, 4rem);
+  padding-inline: clamp(1.5rem, 2.78vw, 3.5rem);
+  background-color: #ffffff;
+}
+
+.owner-audience__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: clamp(2rem, 3.33vw, 3rem);
+  text-align: center;
+}
+
+.owner-audience__title {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
+
+.owner-audience__sub {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 1.5556;
+  color: #4b5563;
+}
+
+.owner-audience__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.owner-audience__card {
+  display: flex;
+  flex: 1 1 18rem;
+  min-width: 0;
+  min-height: 17.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 16px;
+  padding: 1rem 1rem 2.5rem;
+}
+
+.owner-audience__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  align-self: flex-end;
+  width: 100%;
+}
+
+.owner-audience__number {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1.5rem;
+  letter-spacing: 0.15em;
+  color: #0a0a0a;
+}
+
+.owner-audience__card-title {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
+
+.owner-audience__card-body {
+  margin: 0;
+  font-weight: 300;
+  font-size: 1.125rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+}
