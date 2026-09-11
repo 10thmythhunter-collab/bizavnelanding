@@ -59,9 +59,6 @@ function OwnerWorkings() {
       <div className="owner-workings__head">
         <p className="owner-workings__eyebrow">WORKINGS</p>
         <h2 className="owner-workings__title">How Owners work</h2>
-        <p className="owner-workings__body">
-          You learn the number when you&apos;ve already decided to sell
-        </p>
       </div>
 
       <ol className="owner-workings__cards">
