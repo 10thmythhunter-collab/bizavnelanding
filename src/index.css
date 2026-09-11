@@ -10,6 +10,29 @@ body {
   padding: 0;
 }
 
+html {
+  /* iOS Safari inflates the text in some blocks on its own — "text
+     autosizing" — which makes anything set not to wrap come out wider on a
+     phone than it does anywhere else, and wide enough to push past the edge
+     of the page. This holds the sizes the stylesheet actually asks for. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+
+  /* And a hard stop on sideways scroll. Every section on this page is laid
+     out to fit the viewport — measured at 320 through 440, nothing reaches
+     the edge — but three of them host third-party scenes (Unicorn Studio,
+     the shader canvases) that build their own canvas at whatever size they
+     like, on the device rather than here. One of those spilling a few
+     pixels past the right edge is enough to make the whole document wider
+     than the window, and then every section's background, which is only as
+     wide as the window, leaves a white strip down the side of the page.
+
+     clip rather than hidden: hidden would turn the root into a scroll
+     container, which changes how the fixed bar and the anchor jumps behave.
+     clip just refuses to show anything outside the box. */
+  overflow-x: clip;
+}
+
 body {
   font-family:
     "IBM Plex Sans",

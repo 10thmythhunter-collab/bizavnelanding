@@ -85,9 +85,11 @@
      other two already do. */
   gap: 1.5rem;
   /* The design's own 384 measure inside a 410 padding box, which is what
-     puts the break in the captions. */
-  width: 384px;
-  max-width: 100%;
+     puts the break in the captions. As a cap rather than a width: a width
+     is a box the card has to shrink back down, and on a phone the card is
+     narrower than this to begin with. */
+  width: 100%;
+  max-width: 384px;
   color: #0a0a0a;
   /* Only a card with a scene switches at all — see the rule below — and only
      that card's own hover drives it, so a sibling's transition finishing
