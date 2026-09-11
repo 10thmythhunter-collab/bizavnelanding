@@ -81,6 +81,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* The name and the badge are both unbreakable pieces, and on a narrow
+     screen "Plan Enterprise" plus "Most adopted" is wider than the card they
+     sit in — which pushed the badge past the right edge of the page. Nothing
+     clips it there, so the document itself grew wider than the viewport and
+     every section's background, being only as wide as the viewport, left a
+     white strip down the right of the whole page. Letting the row break puts
+     the badge under the name instead. */
+  flex-wrap: wrap;
   gap: 0.75rem;
   padding-bottom: 0.5rem;
 }
@@ -91,7 +99,6 @@
   font-size: 1.875rem;
   line-height: 1.2;
   color: #111827;
-  white-space: nowrap;
 }
 
 .pricing__badge {

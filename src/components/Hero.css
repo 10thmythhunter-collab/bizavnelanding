@@ -648,14 +648,27 @@
     --hero-body-size: 1rem;
   }
 
+  /* Two and two rather than a wrapping row: four across never fitted here,
+     and left to wrap they came out three on one line and one stranded under
+     them. A two-column grid splits them evenly, and the cap keeps the pair
+     reading as a block beside the copy above rather than stretched across
+     the whole screen. */
+  .hero__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--stat-gap);
+    /* Wider than the column gap, so the two rows read as rows. */
+    row-gap: 1.125rem;
+    max-width: 18rem;
+  }
+
   .hero__stat {
     min-width: 0;
   }
 
-  /* The row wraps at this width, and CSS cannot tell which item starts a new
-     line — so the rule would be left hanging at the row's own left edge.
-     There is no mobile frame to match, and no rules reads better than a
-     stray one. */
+  /* The columns are a grid now, and a rule drawn from a cell's own left edge
+     would hang off the start of each row. There is no mobile frame to match,
+     and no rules reads better than stray ones. */
   .hero__stat + .hero__stat::before {
     content: none;
   }

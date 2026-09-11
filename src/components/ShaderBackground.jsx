@@ -487,9 +487,16 @@ function ShaderBackground({ className, seed = UNIFORMS.seed, phase = 0 }) {
       targetPresence = 0;
       requestRender();
     };
+    // No resizeCanvas() here on purpose. Setting canvas.width/height clears
+    // the drawing buffer, and doing that from a resize callback leaves the
+    // canvas blank until the next animation frame paints it — which the
+    // browser can composite in between, one flash per resize. Behind the
+    // Aira chat on a narrow screen that is a hundred-odd resizes as the
+    // transcript grows, and the whole background reads as flickering.
+    // render() resizes at the top of its own frame instead, immediately
+    // before it draws, so a cleared buffer is never on screen.
     const updateLayout = () => {
       bounds = canvas.getBoundingClientRect();
-      resizeCanvas();
       updatePointerTarget();
       requestRender();
     };

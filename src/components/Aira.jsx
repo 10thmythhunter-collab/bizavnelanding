@@ -18,6 +18,10 @@ const REVEAL_AT = 0.2;
 const CHIP_IN = 1500;
 const CHIP_STEP = 320;
 
+// When the last chip has landed. Past this the section drops the arrival
+// rules altogether — see the "rested" state in Aira.css.
+const SEQUENCE_MS = 3200;
+
 // The burst is the scene rather than a still. It keeps the label positions
 // below honest, since they are percentages of the same box.
 const SCENE = "rr0UyQ0o3fHCtxg82WNY";
@@ -98,17 +102,30 @@ function Aira({ variant = "brokers" }) {
 
     section.dataset.reveal = "pending";
 
+    let settle = 0;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         section.dataset.reveal = "done";
         observer.disconnect();
+        // And then out of the way entirely. The arrival leaves a clip-path
+        // on the background, which the browser has to recompute every time
+        // this section's box changes — and the box changes on every line the
+        // chat adds, which on a narrow screen is a hundred times over. None
+        // of it is needed once the section is in.
+        settle = window.setTimeout(() => {
+          section.dataset.reveal = "rested";
+        }, SEQUENCE_MS);
       },
       { threshold: REVEAL_AT },
     );
 
     observer.observe(section);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(settle);
+    };
   }, []);
 
   return (

@@ -385,24 +385,28 @@
 
    Keyed off data-reveal, which Aira.jsx writes onto the section on mount —
    nothing here hides anything until the script that shows it again is
-   running, so a reader without JavaScript gets the section outright. "done"
-   is set once, on the first crossing, and never unset. */
+   running, so a reader without JavaScript gets the section outright.
+   "pending" hides, "done" plays, and once the last chip has landed the
+   section goes to "rested", where none of this applies any more: the
+   clip-path in particular has to go, or the browser recomputes it on every
+   change to this section's box — and the chat inside it changes that box on
+   every line it adds. */
 
-.aira[data-reveal] .aira__bg {
+.aira[data-reveal="pending"] .aira__bg {
   clip-path: circle(0% at 0% 0%);
 }
 
-.aira[data-reveal] .aira__copy {
+.aira[data-reveal="pending"] .aira__copy {
   opacity: 0;
   transform: translateX(-28px);
 }
 
-.aira[data-reveal] .aira__orb {
+.aira[data-reveal="pending"] .aira__orb {
   opacity: 0;
   transform: scale(0.96);
 }
 
-.aira[data-reveal] .aira__label {
+.aira[data-reveal="pending"] .aira__label {
   opacity: 0;
 }
 
@@ -447,7 +451,8 @@
   .aira[data-reveal] .aira__bg,
   .aira[data-reveal] .aira__copy,
   .aira[data-reveal] .aira__orb,
-  .aira[data-reveal] .aira__label {
+  .aira[data-reveal] .aira__label,
+  .aira[data-reveal="done"] .aira__bg {
     clip-path: none;
     opacity: 1;
     transform: none;
