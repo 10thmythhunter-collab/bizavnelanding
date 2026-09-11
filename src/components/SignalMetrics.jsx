@@ -19,9 +19,12 @@ const HOVER_SCENE_EDGE = "ZT8PAcAhhoMTfwNknbBr";
 // The three numbers the Signals copy above quotes, each given its own card —
 // node 205:19561, whose 1440x608 frame is exactly this row plus its padding.
 //
-// The words are the design's, verbatim. Two of its inconsistencies come with
-// them: the first range is written with a hyphen where the other two use an
-// en dash, and the second caption is the only one without a full stop.
+// The words are the design's, verbatim, bar one: the second caption is left
+// unfinished there — no full stop, and a line shorter than the two beside it,
+// so on a phone, where the three stack, it is the one card that visibly stops
+// short. It is closed off here with the design's own words and nothing added.
+// The other inconsistency is left alone: the first range is written with a
+// hyphen where the other two use an en dash.
 const metrics = [
   {
     label: "FROM ORIGIN",
@@ -32,7 +35,7 @@ const metrics = [
   {
     label: "FASTER CLOSINGS",
     figure: "2–4 weeks",
-    note: "What you cut off that cycle by being first in",
+    note: "What you cut off that cycle by being first in.",
     scene: HOVER_SCENE_CLOSINGS,
   },
   {
