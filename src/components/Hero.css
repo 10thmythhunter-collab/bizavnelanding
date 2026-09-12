@@ -16,8 +16,19 @@
   --hero-body-size: 1.0625rem;
   /* Chips sit just under the body line so they read as tags inside the
      sentence rather than as peers of it. Every chip value is in em, so this
-     one ratio drives the label, padding, gap and icon together. */
-  --hero-chip-size: calc(var(--hero-body-size) * 0.941);
+     one ratio drives the label, padding, gap and icon together — and it is
+     also what lets the three of them be kept on one line on a narrow screen
+     by this one number.
+
+     The three at full size measure 331px across. That is 4px more than a
+     375px phone leaves them and 59px more than a 320px one, so they broke
+     to a second line and the intro animation was left retracting a chip
+     from a row that wasn't there. Rather than a breakpoint that rearranges
+     them, the size itself gives way: the vw term takes over below about
+     396px — the width at which the row stops fitting — and hands back the
+     few pixels needed, floored well above legibility. The cap is the
+     original value, so nothing above that width changes at all. */
+  --hero-chip-size: clamp(0.75rem, 3.8vw, calc(var(--hero-body-size) * 0.941));
 }
 
 /* --- background --- */
@@ -351,7 +362,9 @@
   font-size: var(--hero-chip-size);
   gap: 0.5em;
   padding-block: 0.25em;
-  padding-inline: 1em;
+  /* 1em in the design. Trimmed a little so three chips fitting on a narrow
+     screen doesn't come down to the last pixel — at 320 it buys them ten. */
+  padding-inline: 0.85em;
   border: 0.5px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   background-color: rgba(158, 158, 158, 0.04);
@@ -648,29 +661,13 @@
     --hero-body-size: 1rem;
   }
 
-  /* Two and two rather than a wrapping row: four across never fitted here,
-     and left to wrap they came out three on one line and one stranded under
-     them. A two-column grid splits them evenly, and the cap keeps the pair
-     reading as a block beside the copy above rather than stretched across
-     the whole screen. */
+  /* A beat more than the panel's own 1rem between everything else. The
+     sentence and the chips that finish it are one thought; the numbers under
+     them are a separate claim, and at this width they are a block of four
+     rather than a single line, so they need a little air to stop reading as
+     a fourth line of the paragraph above. */
   .hero__stats {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--stat-gap);
-    /* Wider than the column gap, so the two rows read as rows. */
-    row-gap: 1.125rem;
-    max-width: 18rem;
-  }
-
-  .hero__stat {
-    min-width: 0;
-  }
-
-  /* The columns are a grid now, and a rule drawn from a cell's own left edge
-     would hang off the start of each row. There is no mobile frame to match,
-     and no rules reads better than stray ones. */
-  .hero__stat + .hero__stat::before {
-    content: none;
+    margin-top: 0.75rem;
   }
 
   .hero__stat-value {
@@ -679,5 +676,53 @@
 
   .hero__stat-label {
     font-size: 1rem;
+  }
+}
+
+/* The stats break where they actually stop fitting, not with the rest of the
+   phone layout: at the sizes above, four across and their rules measure
+   421px, so they hold the row the design puts them in — one line, four
+   columns — well below where the rest of this section goes to its phone
+   layout. The break is set where about fifty pixels of slack are left rather
+   than at the width where they last fit exactly: a font rendering a little
+   wider on someone else's device should cost nothing, not drop the fourth
+   stat onto a line of its own. */
+@media (max-width: 520px) {
+  /* Two and two. Four across has never fitted on a phone — at 375 the row
+     needs 440px — so the choice is between shrinking them, hiding one behind
+     a swipe, or breaking the row. Breaking it is the only one that keeps all
+     four legible and in front of the reader: these are the numbers the page
+     is asking to be believed on, read once on the way past and never
+     returned to, and the one that would fall off the end of a swipe is the
+     strongest of them. A sideways drag here would also start at the very
+     edge of the screen, where iOS reads it as a back gesture.
+
+     Aligned to the start rather than centred, so both columns hang off the
+     headline's own left edge and a label that needs two lines breaks against
+     a straight edge instead of going ragged on both sides. */
+  .hero__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    column-gap: var(--stat-gap);
+    /* Wider than the gap between the columns, so the rows read as rows. */
+    row-gap: 1.25rem;
+  }
+
+  .hero__stat {
+    align-items: flex-start;
+    min-width: 0;
+    text-align: left;
+  }
+
+  /* Between the columns only. The + selector would put one down the left of
+     the third stat too, which in a grid is the start of the second row — a
+     rule hanging in the open air under the first column. */
+  .hero__stat + .hero__stat::before {
+    content: none;
+  }
+
+  .hero__stat:nth-child(even)::before {
+    content: "";
   }
 }

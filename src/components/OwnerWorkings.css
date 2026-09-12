@@ -112,6 +112,10 @@
      out from the bottom, the two edges meet whatever the card measures. */
   align-items: flex-end;
   justify-content: center;
+  /* Definite, so the ratio only decides the height: left to stretch, WebKit
+     resolves the other axis first and derives a narrower box from the
+     content — see the same note on .metrics__card. */
+  width: 100%;
   aspect-ratio: 442 / 523;
   border-radius: 1rem;
   overflow: hidden;

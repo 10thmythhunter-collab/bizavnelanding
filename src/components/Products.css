@@ -127,6 +127,10 @@
 
 .products__visual {
   position: relative;
+  /* Definite, so the ratio only decides the height: left to stretch, WebKit
+     resolves the other axis first and derives a narrower box from the
+     content — see the same note on .metrics__card. */
+  width: 100%;
   /* The design's 442x523. Ratio rather than a height, so the panel keeps its
      shape as the card narrows. */
   aspect-ratio: 442 / 523;

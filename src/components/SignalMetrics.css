@@ -45,6 +45,15 @@
      thirds empty. */
   justify-content: flex-end;
   min-width: 0;
+  /* The inline size settled here rather than left to the column's own
+     stretch. An aspect-ratio only says how the two axes relate, not which
+     one is decided first, and WebKit resolves this one the other way round
+     to Chrome: on iOS it took the card's height from its content — the
+     middle card's caption is a line shorter than the two beside it — and
+     then handed back a width through the ratio, so that card came out
+     visibly narrower than its neighbours. A definite width settles the
+     inline axis first, and leaves the ratio only the height to decide. */
+  width: 100%;
   /* The design's 442x523, as a ratio rather than a height, so the card keeps
      its shape as the row narrows. */
   aspect-ratio: 442 / 523;
