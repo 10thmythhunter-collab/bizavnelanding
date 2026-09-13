@@ -101,6 +101,10 @@ function TerminalMenu() {
   );
 }
 
+// The same exchange the full demo plays — an aircraft search, not a charter
+// booking — cut to what fits a card this size: the type asked for, three
+// tails that are actually on the market, and the one line of mission that
+// turns the search over. See AiraChat.jsx for the whole thing.
 function AiraChat() {
   return (
     <div className="preview__panel preview__panel--chat">
@@ -120,12 +124,12 @@ function AiraChat() {
       <div className="preview__rule preview__rule--chat" />
 
       <p className="preview__bubble preview__bubble--user">
-        Find me a Challenger 350, Nice → London, Thursday 08:00.
+        Find me a Challenger 350.
       </p>
 
       <p className="preview__bubble preview__bubble--ai">
-        Three tails within range. Best fit lifts at 08:15 from NCE, €18,400
-        all-in — crew and slots confirmed. Want me to draft the quote?
+        Three on the market: a 2016 at 1,980 hours, $15.9M; a 2018 EASA tail,
+        $18.4M; and one off-market at $14.2M. Want the full specs?
       </p>
 
       <img
@@ -136,7 +140,7 @@ function AiraChat() {
       />
 
       <span className="preview__chat-suggest">
-        I need something smaller for europe
+        It&rsquo;ll mostly fly Nice&ndash;London
       </span>
     </div>
   );
