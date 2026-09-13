@@ -247,7 +247,11 @@
 
 .nav__link {
   position: relative;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  /* Between a mark and its word. Close enough that the two read as one
+     label rather than as an icon with a link after it. */
+  gap: 0.45em;
   /* Bare text leaves the target under the 24px minimum; this takes it to
      ~28px. Symmetric, so the row's centre stays put. */
   padding-block: 0.4375em;
@@ -265,7 +269,32 @@
    link having changed state, one that sweeps reads as the pointer running
    along it. scaleX off a left origin, so it is a transform the compositor
    can carry rather than a width the layout has to re-resolve each frame. */
-.nav__link::after {
+.nav__link-icon {
+  display: block;
+  width: var(--nav-icon-size, 1.1875em);
+  height: var(--nav-icon-size, 1.1875em);
+  flex-shrink: 0;
+  /* The bar's own ink, so the marks turn with the text when the bar goes
+     white over a scrolled page. */
+  background-color: currentColor;
+  mask-image: var(--nav-icon);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: var(--nav-icon);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+/* The anchor for the rule below, which is why the label is a box of its
+   own. */
+.nav__link-label {
+  position: relative;
+  display: block;
+}
+
+.nav__link-label::after {
   content: "";
   position: absolute;
   left: 0;
@@ -281,8 +310,8 @@
 }
 
 /* Keyboard users get the same rule, not just the focus ring. */
-.nav__link:hover::after,
-.nav__link:focus-visible::after {
+.nav__link:hover .nav__link-label::after,
+.nav__link:focus-visible .nav__link-label::after {
   transform: scaleX(1);
 }
 
@@ -707,7 +736,7 @@
 
   /* The row's own ground says what is under the pointer here; the sliding
      rule was for labels sitting in a line with nothing else to show it. */
-  .nav__link::after {
+  .nav__link-label::after {
     display: none;
   }
 }
@@ -755,7 +784,7 @@
   .nav__link,
   .nav__cta,
   .nav__download,
-  .nav__link::after,
+  .nav__link-label::after,
   .nav__cta-fill {
     transition: none;
   }

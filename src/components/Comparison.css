@@ -73,6 +73,14 @@
 /* --- panels --- */
 
 .comparison__panels {
+  /* The two panels arrive from the sides, and a box moved by a transform
+     still counts towards the page's own scrollable width — armed, the right
+     panel sat 40px past the right edge and made the document wider than the
+     window until the section was scrolled to. Clipped here, they slide in
+     from behind this row's edges instead, and the page never grows.
+
+     clip rather than hidden: hidden would make this a scroll container. */
+  overflow-x: clip;
   display: flex;
   /* Start, not stretch: the two panels hold their own heights in the design,
      and the right one is 4px taller because its heading carries a wordmark. */
@@ -200,5 +208,92 @@
 
   .comparison__title {
     text-wrap: balance;
+  }
+}
+
+/* --- the section arriving ---
+
+   In the order it is read: the label and the line it introduces come in
+   together, out of focus; the paragraph under them follows; then the two
+   panels arrive from the sides they sit on — today's from the left, ours
+   from the right — so the comparison assembles itself around the middle
+   rather than appearing whole.
+
+   Keyed off data-reveal, which Comparison.jsx writes onto the section on
+   mount: nothing here hides anything until the script that can show it again
+   is running, so a reader without JavaScript gets the section outright.
+   "done" is set once, on the first crossing, and never unset — scrolling
+   back up leaves it where it is. */
+
+.comparison[data-reveal] .comparison__eyebrow,
+.comparison[data-reveal] .comparison__title,
+.comparison[data-reveal] .comparison__lead {
+  opacity: 0;
+  filter: blur(14px);
+  transform: translateY(10px);
+}
+
+.comparison[data-reveal] .comparison__panel {
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateX(var(--comparison-from));
+}
+
+/* Each from its own side. 40px: far enough to read as coming in from
+   somewhere, short enough that it is never a slide across the page.
+   
+   The side is handed over as a value rather than written as two transform
+   rules of its own: :first-child would make those rules more specific than
+   the shared "transform: none" below, and the panels would come into focus
+   forty pixels from where they belong and stay there. A custom property
+   carries the difference without carrying the specificity. */
+.comparison__panel:first-child {
+  --comparison-from: -40px;
+}
+
+.comparison__panel:last-child {
+  --comparison-from: 40px;
+}
+
+.comparison[data-reveal="done"] .comparison__eyebrow,
+.comparison[data-reveal="done"] .comparison__title,
+.comparison[data-reveal="done"] .comparison__lead,
+.comparison[data-reveal="done"] .comparison__panel {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+  /* On the shown state only, so arming is instant and only the arrival
+     animates. */
+  transition:
+    opacity 700ms ease,
+    filter 700ms ease,
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The beats. The label and the title share the first one — the label is that
+   title's own, not a step before it. */
+.comparison[data-reveal="done"] .comparison__lead {
+  transition-delay: 260ms;
+}
+
+.comparison[data-reveal="done"] .comparison__panel:first-child {
+  transition-delay: 520ms;
+}
+
+.comparison[data-reveal="done"] .comparison__panel:last-child {
+  transition-delay: 700ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No arrival at all rather than a slower one: the section is simply
+     there. */
+  .comparison[data-reveal] .comparison__eyebrow,
+  .comparison[data-reveal] .comparison__title,
+  .comparison[data-reveal] .comparison__lead,
+  .comparison[data-reveal] .comparison__panel {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
   }
 }

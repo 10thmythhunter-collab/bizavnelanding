@@ -138,7 +138,7 @@ function DemoDialog({ open, onClose }) {
 
         <p className="demo__eyebrow">REGISTER INTEREST</p>
         <h2 className="demo__title" id={`${ids}-title`}>
-          Discuss your enterprise solution
+          Discuss your In-House solution
         </h2>
         <p className="demo__body" id={`${ids}-body`}>
           A 30-minute walkthrough on your own market. Pick the OEM, pick the

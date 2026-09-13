@@ -111,7 +111,7 @@ function App() {
             <WhyNotSubscription />
             <Pricing />
             <Vision />
-            <Testimonials />
+            {/* <Testimonials /> */}
             <Footer />
           </div>
 

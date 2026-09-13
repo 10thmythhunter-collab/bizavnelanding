@@ -8,7 +8,7 @@ import "./Pricing.css";
 const plans = [
   {
     key: "growth",
-    name: "Plan Growth",
+    name: "Growth Plan",
     description:
       "Independents and small-mid firms scaling beyond spreadsheets.",
     cta: "Talk to sales",
@@ -21,17 +21,26 @@ const plans = [
     ],
   },
   {
-    key: "enterprise",
-    name: "Plan Enterprise",
+    key: "in-house",
+    // "In-House Plan", to the same pattern as the one beside it — the plan
+    // named first, the word "Plan" after it.
+    name: "In-House Plan",
     badge: "Most adopted",
+    // Two sentences where the other card has one: who it is for, and then
+    // what is actually being bought. The second is the whole difference
+    // between this tier and the one beside it — at this price a firm is not
+    // buying more seats, it is having its own AI and machine learning team
+    // built — and nothing else on the card was saying it.
     description:
-      "Large-mid and mega-brokers running institutional-grade workflow.",
-    cta: "Discuss your enterprise solution",
+      "Large-mid and mega-brokers running institutional-grade workflow. At this tier we build your In-House AI and machine learning team.",
+    cta: "Discuss your In-House solution",
     ctaVariant: "solid",
     includesLabel: "Everything, fully unlocked:",
     items: [
+      // First in the list for the same reason: it is the reason for the
+      // tier, not a line item under it.
+      "An In-House AI and machine learning team, built with your desk and working only on it",
       "Terminal, Aira & Signals — unlimited seats, full run rate, all feed tiers bundled",
-      "Jetquity & Connect — financier command center plus unlimited stakeholder access",
       "Custom development & intelligence — bespoke builds and research for your desk",
     ],
   },
@@ -42,7 +51,7 @@ function Pricing() {
     <section className="pricing">
       <header className="pricing__head">
         <p className="pricing__eyebrow">PRICING</p>
-        <h2 className="pricing__title">Two ways in. Both opinionated</h2>
+        <h2 className="pricing__title">Two ways to work with us</h2>
       </header>
 
       <div className="pricing__cards">
@@ -59,7 +68,7 @@ function Pricing() {
           }) => (
             <div
               className="pricing__card"
-              data-featured={key === "enterprise" ? "" : undefined}
+              data-featured={key === "in-house" ? "" : undefined}
               key={key}
             >
               <div className="pricing__card-head">
@@ -93,7 +102,7 @@ function Pricing() {
                 </div>
               </div>
             </div>
-          )
+          ),
         )}
       </div>
     </section>

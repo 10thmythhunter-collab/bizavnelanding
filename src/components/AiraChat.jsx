@@ -13,38 +13,47 @@ const EXIT_MS = 300;
 // named kind on its way out as it lands, which is how the answer takes the
 // thinking bubble's place.
 //
-// The words are the design's, verbatim — lowercase "europe" included.
+// The exchange is an aircraft search, not a charter booking: a broker asks
+// for a type, Aira comes back with what is actually on the market, and the
+// mission the aeroplane will fly is what changes the answer. That second part
+// is the point of the demo — the first list is the type that was asked for,
+// the second is what the route says it should have been.
+//
+// The design's own transcript was a charter quote; these words are written to
+// the same shape — the numbers that decide it, and the next move handed back
+// to the broker — but they are not the design's. The figures are plausible
+// for the types named rather than quoted from anywhere.
 const OPENING = [
   {
     after: 340,
     kind: "user",
-    text: "Find me a Challenger 350, Nice → London, Thursday 08:00.",
+    text: "Find me a Challenger 350.",
   },
   { after: 620, kind: "thinking" },
   {
     after: 1650,
     kind: "ai",
     clears: "thinking",
-    text: "Three tails within range. Best fit lifts at 08:15 from NCE, €18,400 all-in — crew and slots confirmed. Want me to draft the quote?",
+    text: "Three worth your time: a 2016 at 1,980 hours, $15.9M; a 2018 EASA tail, 1,240 hours, $18.4M; and an off-market 2015 at 2,600 hours the owner will take $14.2M for. Want the full specs?",
   },
-  { after: 620, kind: "suggest", text: "I need something smaller for europe" },
+  { after: 620, kind: "suggest", text: "It’ll mostly fly Nice–London" },
 ];
 
-// What the suggestion leads to. The design stops at the white pill, so the
-// answer past it is written to the same brief: one concrete tail, the numbers
-// that decide it, and the next move handed back to the broker.
+// What the suggestion leads to. One line of mission turns the search over:
+// the type asked for is more aeroplane than a 640-mile leg needs, and the two
+// it is replaced by can do the thing the 350 cannot.
 const FOLLOW_UP = [
   {
     after: 140,
     kind: "user",
-    text: "I need something smaller for europe",
+    text: "It’ll mostly fly Nice–London",
   },
   { after: 560, kind: "thinking" },
   {
     after: 1700,
     kind: "ai",
     clears: "thinking",
-    text: "Then the Phenom 300E is the fit — 08:05 out of NCE, €11,600 all-in, same slot window. Two seats fewer than the 350, and it clears London City. Want me to hold it?",
+    text: "That leg is 640 nm — on it the 350 is range you pay for and never use, and it can’t take London City. Two that can: a 2019 Phenom 300E, 940 hours, $12.8M, and a 2021 Praetor 500, 610 hours, $16.9M. Want the records?",
   },
 ];
 

@@ -210,6 +210,88 @@
   color: #0a0a0a;
 }
 
+.hero__switch-slot {
+  /* The anchor for the note beside it. */
+  position: relative;
+  display: inline-flex;
+}
+
+/* The barred cursor, on the wrapper as well as on the button inside it. A
+   disabled control is not a pointer target at all in some browsers — no
+   hover, no events, its own cursor never used — and is in others, where it
+   covers the wrapper entirely. Setting both is what makes the pointer read
+   the same either way, and the wrapper is also what the note hangs off. */
+.hero__switch-slot[data-soon] {
+  cursor: not-allowed;
+}
+
+/* The note, beside the option. pointer-events: none so it can never sit
+   between the cursor and the track underneath it. */
+.hero__switch-tip {
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+  padding: 6px 14px;
+  border: 0.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  /* Its own ground rather than the track's near-transparent glass: this has
+     to be readable over whatever frame of the video is behind it. */
+  background-color: rgba(10, 10, 10, 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-size: 0.8125rem;
+  line-height: normal;
+  letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+/* Only where there is a pointer to hover with. On a touch screen hover
+   latches after a tap and there is no way to clear it. */
+@media (hover: hover) {
+  .hero__switch-slot[data-soon]:hover .hero__switch-tip {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__switch-tip {
+    transition: none;
+  }
+}
+
+/* Legible rather than faded out: it has to keep announcing the product, so
+   it reads as a label with a status on it instead of a control waiting to be
+   pressed — no pointer, no hover, and the dot and icon dimmed with it. */
+.hero__switch-option:disabled {
+  color: rgba(255, 255, 255, 0.45);
+  /* The same barred cursor the wrapper carries. Whether a disabled button is
+     the pointer's target at all differs between browsers, so the cursor is
+     set on both: whichever of the two the browser hands the pointer to, it
+     shows the same thing. */
+  cursor: not-allowed;
+}
+
+.hero__switch-soon {
+  /* Smaller and set apart, so "Owners" stays the word being read and this
+     stays a note attached to it. In em, so it follows the option's own size
+     down on a narrow screen. */
+  font-size: 0.75em;
+  letter-spacing: 0;
+  opacity: 0.75;
+}
+
+.hero__switch-soon::before {
+  /* Written in the markup as two separate words, so a screen reader says
+     "Owners coming soon" rather than reading out a dash. */
+  content: "· ";
+}
+
 .hero__switch-option:focus-visible {
   outline: 2px solid #3b82f6;
   outline-offset: 3px;
@@ -659,6 +741,26 @@
   /* The chips follow this down, so the whole subtitle block shrinks as one. */
   .hero {
     --hero-body-size: 1rem;
+  }
+
+  /* Above the track rather than past its right edge: there is no room
+     beside it at this width, and a note running off the side of the screen
+     would be clipped rather than read. */
+  .hero__switch-tip {
+    left: auto;
+    right: 0;
+    top: auto;
+    bottom: calc(100% + 10px);
+    transform: none;
+  }
+
+  /* The Owners option carries its status now, and the pair of them stopped
+     fitting the narrowest screens — 325px against the 272 a 320px phone
+     leaves. The track gives back the difference the same way the chips below
+     it do: out of its own padding and type rather than by dropping a word. */
+  .hero__switch-option {
+    padding-inline: 11px;
+    font-size: 0.9375rem;
   }
 
   /* A beat more than the panel's own 1rem between everything else. The

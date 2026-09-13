@@ -27,14 +27,19 @@ const products = [
 // which flips from white-on-glass to near-black-on-white when selected.
 const audiences = [
   { name: "Brokers", icon: userTieIcon, iconSize: "18px" },
-  { name: "Owners", icon: keyIcon, iconSize: "16px" },
+  // The Owners side is built and still in the tree, but it is not being shown
+  // yet: the option stays visible so the page says the product is coming, and
+  // is disabled so it cannot be reached. Taking the option away instead would
+  // lose the announcement, and leaving it live would hand out a page that is
+  // not ready.
+  { name: "Owners", icon: keyIcon, iconSize: "16px", soon: "coming soon" },
 ];
 
 const stats = [
   { value: "1.5B", label: "Datapoints" },
   { value: "4", label: "Modules" },
   { value: "Global", label: "Coverage" },
-  { value: "20+", label: "Pre-registered firms" },
+  { value: "Over $3B", label: "Deals already transacted on platform" },
 ];
 
 function ProductBadge({ product }) {
@@ -72,7 +77,7 @@ function Hero({ audience, onAudienceChange }) {
   const [switched, setSwitched] = useState(false);
 
   const [ownersVideoArmed, setOwnersVideoArmed] = useState(
-    audience === "Owners",
+    audience === "Owners"
   );
 
   useEffect(() => {
@@ -90,7 +95,7 @@ function Hero({ audience, onAudienceChange }) {
 
     const toCarousel = setTimeout(
       () => setPhase("carousel"),
-      RETRACT_AT + RETRACT_MS,
+      RETRACT_AT + RETRACT_MS
     );
 
     return () => {
@@ -103,7 +108,7 @@ function Hero({ audience, onAudienceChange }) {
     if (phase !== "carousel") return;
     const id = setInterval(
       () => setActive((i) => (i + 1) % products.length),
-      STEP_MS,
+      STEP_MS
     );
     return () => clearInterval(id);
   }, [phase]);
@@ -155,43 +160,70 @@ function Hero({ audience, onAudienceChange }) {
 
       <div className="hero__content">
         <div className="hero__switch" role="group" aria-label="Audience">
-          {audiences.map(({ name, icon, iconSize }) => (
-            <button
-              className="hero__switch-option"
-              type="button"
+          {audiences.map(({ name, icon, iconSize, soon }) => (
+            /* The wrapper is what carries the barred cursor and the note,
+               not the button: a disabled control dispatches no pointer
+               events, so anything hung off the button itself would never
+               fire. Both options are wrapped so the two stay identical
+               boxes in the track. */
+            <span
+              className="hero__switch-slot"
+              data-soon={soon ? "" : undefined}
               key={name}
-              aria-pressed={name === audience}
-              onClick={() => {
-                setSwitched(true);
-                if (name === "Owners") setOwnersVideoArmed(true);
-                onAudienceChange(name);
-              }}
             >
-              {/* Always in the flow rather than mounted only on the selected
+              <button
+                className="hero__switch-option"
+                type="button"
+                // A real disabled button, not a click handler that
+                // declines: this is what takes it out of the tab order and
+                // has a screen reader announce it as unavailable rather than
+                // as a control that does nothing.
+                disabled={Boolean(soon)}
+                aria-pressed={name === audience}
+                onClick={() => {
+                  setSwitched(true);
+                  if (name === "Owners") setOwnersVideoArmed(true);
+                  onAudienceChange(name);
+                }}
+              >
+                {/* Always in the flow rather than mounted only on the selected
                   option: conditional mounting took its 4px plus the row's
                   own gap with it, so the option a click landed on visibly
                   grew a beat after its background did. Rendering it on both
                   and fading it in CSS keeps both buttons the same width
                   throughout, which is what makes the switch itself read as
                   one smooth move rather than a resize plus a fade. */}
-              <span
-                className="hero__switch-dot"
-                data-active={name === audience ? "" : undefined}
-                aria-hidden="true"
-              />
-              <span
-                className="hero__switch-icon"
-                style={{
-                  // Quoted: the build inlines these two files as data URIs,
-                  // and the single quotes inside one are illegal in a bare
-                  // url() token.
-                  "--switch-icon": `url("${icon}")`,
-                  "--switch-icon-size": iconSize,
-                }}
-                aria-hidden="true"
-              />
-              {name}
-            </button>
+                <span
+                  className="hero__switch-dot"
+                  data-active={name === audience ? "" : undefined}
+                  aria-hidden="true"
+                />
+                <span
+                  className="hero__switch-icon"
+                  style={{
+                    // Quoted: the build inlines these two files as data URIs,
+                    // and the single quotes inside one are illegal in a bare
+                    // url() token.
+                    "--switch-icon": `url("${icon}")`,
+                    "--switch-icon-size": iconSize,
+                  }}
+                  aria-hidden="true"
+                />
+                {name}
+                {/* Part of the button's own text, so the accessible name
+                    reads "Owners coming soon" — the status has to reach a
+                    reader who cannot see that it is greyed out. */}
+                {soon && <span className="hero__switch-soon">{soon}</span>}
+              </button>
+
+              {/* Hidden from assistive tech: it says again what the button's
+                  own name already carries, and only exists for a pointer. */}
+              {soon && (
+                <span className="hero__switch-tip" aria-hidden="true">
+                  Product still in development
+                </span>
+              )}
+            </span>
           ))}
         </div>
 
@@ -292,7 +324,7 @@ function Hero({ audience, onAudienceChange }) {
               {/* The design's own copy, typo included — kept as authored,
                   the way this project leaves the rest of the design's own
                   slips rather than silently correcting its wording. */}
-              Dowanload now
+              Download now
             </button>
           </div>
         </div>

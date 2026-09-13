@@ -1,6 +1,9 @@
 import { useEffect, useId, useRef, useState } from "react";
+import airaIcon from "../assets/aira.png";
 import downloadIcon from "../assets/download-icon.svg";
 import ownersLogo from "../assets/ownersLogo.svg";
+import terminalIcon from "../assets/terminal-mini.svg";
+import waveIcon from "../assets/wave.svg";
 import { HERO_INTRO_END } from "../timeline.js";
 import "./Nav.css";
 
@@ -11,16 +14,49 @@ const DARK_SECTIONS = ".hero, .aira, .signals";
 
 // Split from the rest of the nav because the annotation below brackets
 // exactly these three — the bracket takes its width from the sub-list.
+//
+// The marks are the hero chips' own, and carried the same way they are
+// there: Aira's and Signals' are drawn larger than Terminal's because one is
+// a radial burst with empty space around it and the other a wave half as
+// tall as it is wide, so at a shared box size both read visibly smaller.
+//
+// They are painted as masks rather than dropped in as images, though, and
+// that is a real difference from the chips: two of the three files are
+// white, which is invisible the moment the bar turns white under a scrolled
+// page. Masked, they are the bar's own ink and flip with it.
 const productLinks = [
-  { label: "Terminal", href: "#terminal" },
-  { label: "Aira", href: "#aira" },
-  { label: "Signals", href: "#signals" },
+  {
+    label: "Terminal",
+    href: "#terminal",
+    icon: terminalIcon,
+    size: "1.1875em",
+  },
+  { label: "Aira", href: "#aira", icon: airaIcon, size: "1.3em" },
+  { label: "Signals", href: "#signals", icon: waveIcon, size: "1.3em" },
 ];
 
 // Named after the section it goes to, which calls itself "Our vision" —
 // "About us" was pointing at nothing in particular under a heading that
 // does not exist on the page.
 const links = [{ label: "Our vision", href: "#vision" }];
+
+// The label is always its own box, with or without a mark beside it: the
+// sliding rule under a link is drawn on this rather than on the anchor, so
+// it runs the width of the word and not the width of the word plus an icon.
+function LinkBody({ label, icon, size }) {
+  return (
+    <>
+      {icon && (
+        <span
+          className="nav__link-icon"
+          style={{ "--nav-icon": `url("${icon}")`, "--nav-icon-size": size }}
+          aria-hidden="true"
+        />
+      )}
+      <span className="nav__link-label">{label}</span>
+    </>
+  );
+}
 
 // Node 215:21303's own bar — a different logo, a different set of links, and
 // the same white download pill the Owners hero carries, in place of the
@@ -212,7 +248,7 @@ function Nav({ audience, onRequestDemo }) {
             ownersLinks.map(({ label, href }) => (
               <li key={label}>
                 <a className="nav__link" href={href}>
-                  {label}
+                  <LinkBody label={label} />
                 </a>
               </li>
             ))
@@ -220,10 +256,10 @@ function Nav({ audience, onRequestDemo }) {
             <>
               <li className="nav__products">
                 <ul className="nav__products-list">
-                  {productLinks.map(({ label, href }) => (
+                  {productLinks.map(({ label, href, icon, size }) => (
                     <li key={label}>
                       <a className="nav__link" href={href}>
-                        {label}
+                        <LinkBody label={label} icon={icon} size={size} />
                       </a>
                     </li>
                   ))}
@@ -278,7 +314,7 @@ function Nav({ audience, onRequestDemo }) {
               {links.map(({ label, href }) => (
                 <li key={label}>
                   <a className="nav__link" href={href}>
-                    {label}
+                    <LinkBody label={label} />
                   </a>
                 </li>
               ))}

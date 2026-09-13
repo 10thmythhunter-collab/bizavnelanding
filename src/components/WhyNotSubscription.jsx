@@ -52,8 +52,8 @@ function WhyNotSubscription() {
       <header className="why-not__head">
         <p className="why-not__eyebrow">WHY NOT JUST A DATA SUBSCRIPTION</p>
         <h2 className="why-not__title">
-          <span>You already pay for our competitors</span>
-          <span>Neither of them does the work.</span>
+          <span>You already pay for outdated software</span>
+          <span>None of it does the work</span>
         </h2>
         <p className="why-not__body">
           They are databases, and good ones. But a database hands you a record
@@ -72,7 +72,7 @@ function WhyNotSubscription() {
             <span className="why-not__badge why-not__badge--minus">
               <img src={badgeMinus} alt="" loading="lazy" />
             </span>
-            <p className="why-not__col-title">With our competitors</p>
+            <p className="why-not__col-title">With current systems</p>
           </div>
           <div
             className="why-not__cell why-not__cell--bizav"

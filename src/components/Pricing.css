@@ -64,7 +64,7 @@
 }
 
 /* The design's own callout: a blue ring and a pale blue wash on the
-   Enterprise card. */
+   In-House card. */
 .pricing__card[data-featured] {
   border: 2px solid #3b82f6;
   background-color: #eff6ff;
@@ -82,7 +82,7 @@
   align-items: center;
   justify-content: space-between;
   /* The name and the badge are both unbreakable pieces, and on a narrow
-     screen "Plan Enterprise" plus "Most adopted" is wider than the card they
+     screen "In-House Plan" plus "Most adopted" is wider than the card they
      sit in — which pushed the badge past the right edge of the page. Nothing
      clips it there, so the document itself grew wider than the viewport and
      every section's background, being only as wide as the viewport, left a
