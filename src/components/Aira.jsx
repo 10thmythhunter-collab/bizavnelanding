@@ -237,9 +237,20 @@ function Aira({ variant = "brokers" }) {
           {labels.map(({ text, left, top, float, phase }, index) => (
             <span
               className="aira__label"
+              // Which side of the burst it hangs on. Only the phone
+              // stylesheet reads it, and only to hang the right-hand two off
+              // the right edge instead of off a left offset — see the
+              // breakpoint in Aira.css.
+              data-side={Number.parseFloat(left) > 50 ? "right" : "left"}
               style={{
-                left,
-                top,
+                // Handed over as custom properties rather than set as left
+                // and top directly. An inline left beats any stylesheet rule
+                // short of !important, so the phone breakpoint below could
+                // not take it back — it would end up with a left AND a right,
+                // which stretches the pill between them instead of letting it
+                // shrink to its own text.
+                "--aira-left": left,
+                "--aira-top": top,
                 "--aira-float": float,
                 "--aira-float-phase": phase,
                 // The array is in the order they hang on the orbit, top to
