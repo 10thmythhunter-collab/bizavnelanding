@@ -614,6 +614,24 @@
   }
 }
 
+/* The mirror of the above, for a chip that comes out of a parent standing to
+   its right rather than its left: it starts a width and a gap the other way,
+   so it begins occluded on that side instead. Only the phone reads it — see
+   the breakpoint, where the row comes out of its middle. */
+@keyframes hero-chip-emerge-left {
+  from {
+    opacity: 0;
+    transform: translateX(calc(100% + var(--chip-gap)));
+  }
+  22% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Animated on the leaf elements, not on .hero__subtitle: a transform or an
    opacity below 1 on an ancestor makes that ancestor a backdrop root, which
    leaves the pills with nothing to blur until the animation settles. An
@@ -791,6 +809,42 @@
   /* The chips follow this down, so the whole subtitle block shrinks as one. */
   .hero {
     --hero-body-size: 1rem;
+  }
+
+  /* The row comes out of its middle here, not out of its left end.
+     
+     On a desk the three chips continue a sentence that runs left to right, so
+     coming out of the first one and going back into it is the same direction
+     the reading is going. Centred on a phone there is no such direction: the
+     row is a shape in the middle of the screen, and a shape that builds
+     itself off its left edge is lopsided the whole way out and then jumps
+     when the other two drop from the layout and what is left re-centres.
+
+     Out of the middle instead. The chip carrying the carousel is put in the
+     middle of the row — it is the one that stays, so it is the one the other
+     two should be arriving from and returning into — and its neighbours come
+     out to either side of it and go back the same way. The row is balanced at
+     every frame of it, and the chip left standing at the end is already very
+     nearly where the row's own centre was, so there is next to nothing left
+     to re-centre.
+
+     Order alone does the arranging: nth-child still counts the document, so
+     the rules above and the offsets measured in JS all go on meaning what
+     they meant. The one thing that has to be told is that the left-hand chip
+     now has its parent on the right, so it emerges the other way. And the
+     stacking wants no help at all — the carousel chip already outranks both
+     of them, which in the middle is exactly where that is wanted. */
+  .hero__pill:nth-child(1) {
+    order: 2;
+  }
+
+  .hero__pill:nth-child(2) {
+    order: 1;
+    animation-name: hero-chip-emerge-left;
+  }
+
+  .hero__pill:nth-child(3) {
+    order: 3;
   }
 
   /* Above the track rather than past its right edge: there is no room
