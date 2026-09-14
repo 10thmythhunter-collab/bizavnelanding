@@ -17,9 +17,9 @@
      token, because the ground, the keyframe that takes it there and the pane
      that lands the dive must not be able to drift apart. */
   --sky: #0e699d;
-  /* The two aircraft are placed to run off the edge of the frame, and the
-     logo is scaled a couple of hundred times over on the way out; the screen
-     crops both, it does not grow to fit them. */
+  /* The sketch is bled past every edge of the frame, and the logo is scaled a
+     couple of hundred times over on the way out; the screen crops both, it
+     does not grow to fit them. */
   overflow: hidden;
   transition:
     opacity 400ms ease,
@@ -34,51 +34,34 @@
   pointer-events: none;
 }
 
-/* --- the drawings ---
-   Each is swept over one line at a time while the bar fills. Every path
-   carries the place it holds along that sweep, written into the asset itself,
-   and turns up that many steps after the front sets off.
+/* --- the drawing ---
+   The design's background, bled to all four edges the way the design bleeds
+   it: one pen sketch of a jet over cloud, swept on a line at a time while the
+   bar fills. Every path carries the place it holds along that sweep, written
+   into the asset itself, and turns up that many steps after the front sets
+   off. How far back it sits is the group opacity Figma holds it at, carried
+   through in the asset — nothing here dims it further. */
 
-   The design stands the copy in the left quarter and gives the aircraft
-   everything to the right of it, so both drawings are over there, side by
-   side, clear of the text. */
-
-.loading__blueprint {
+.loading__art {
   position: absolute;
-  top: 50%;
-  /* Only bites on the <img> the fetch falls back to; the inline svg is sized
-     by the rule below. */
-  height: auto;
-  transform: translateY(-50%);
-  /* How far back the drawings sit. The design's own background is a pen
-     sketch washed nearly into the paper; this is the line weight's share of
-     that. It is on the drawing rather than baked into the asset so it stays a
-     number to turn, and it multiplies each line's own fade rather than
-     fighting it. */
-  opacity: 0.8;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-/* The copy runs to 32.5vw. These start just past it and carry to the right
-   edge and over it — the design's own aircraft is cropped by that edge rather
-   than fitted inside it, and the weight of the frame sits right of centre
-   because of it. */
-.loading__blueprint--left {
-  left: 33vw;
-  width: 32vw;
-}
-
-.loading__blueprint--right {
-  left: 66.5vw;
-  width: 35vw;
-}
-
-.loading__blueprint svg {
+/* The sketch is drawn on a 1431x705 page and the window is whatever it is.
+   The asset carries preserveAspectRatio="slice", so it fills the frame and
+   lets the frame crop it — the same way the design runs it off all four
+   edges — rather than letterboxing a drawing that has no edges to show. */
+.loading__art svg,
+.loading__art img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
 }
 
-.loading__blueprint .ink {
+.loading__art .ink {
   animation: loading-line var(--line-ms) ease-out both;
   animation-delay: calc(
     var(--draw-at, 0ms) + var(--i, 0) * var(--line-step, 0ms)
@@ -218,16 +201,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Below the design's proportions the aircraft and the copy stop fitting side
-   by side. */
+/* Below the design's proportions the copy stops fitting in a quarter of the
+   frame. The drawing stays: it is bled and cropped either way, and it is the
+   paper the screen is printed on. */
 @media (max-width: 900px) {
-  /* The aircraft need the right two thirds of the frame to stand clear of the
-     copy, and there isn't one; the copy has the screen to itself. */
-  .loading__blueprint--left,
-  .loading__blueprint--right {
-    display: none;
-  }
-
   .loading__copy {
     left: 6%;
     right: 6%;
@@ -272,7 +249,7 @@
    down back to the first, so the pen retreats the way it came. Filled both
    ways: a line has to stand there until its turn comes, and the entrance it
    was holding is gone the moment this replaces it. */
-.loading[data-stage="exit"] .loading__blueprint .ink {
+.loading[data-stage="exit"] .loading__art .ink {
   animation: loading-vanish var(--line-ms) ease-in
     calc((var(--steps, 1) - var(--i, 0)) * var(--undraw-step, 0ms)) both;
 }
@@ -413,17 +390,17 @@
     transform: none;
   }
 
-  /* One fade for each drawing rather than several hundred. */
-  .loading__blueprint .ink,
-  .loading[data-stage="exit"] .loading__blueprint .ink {
+  /* One fade for the drawing rather than a thousand. */
+  .loading__art .ink,
+  .loading[data-stage="exit"] .loading__art .ink {
     animation: none;
   }
 
-  .loading__blueprint {
+  .loading__art {
     animation: loading-fade var(--load-ms) ease-out both;
   }
 
-  .loading[data-stage="exit"] .loading__blueprint {
+  .loading[data-stage="exit"] .loading__art {
     animation: loading-vanish var(--undraw-ms) ease-in both;
   }
 

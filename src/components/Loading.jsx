@@ -1,6 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
-import leftUrl from "../assets/blueprint-left.svg";
-import rightUrl from "../assets/blueprint-right.svg";
+import sketchUrl from "../assets/loading-sketch.svg";
 import lockup from "../assets/bizavLockup.svg";
 import heroPoster from "../assets/hero-skyline.jpg";
 import "./Loading.css";
@@ -36,20 +35,17 @@ function smooth(t) {
 // of a sweep and the next is whatever is left of the load divided between them.
 const LINE_MS = 400;
 
-// The drawings are inlined rather than dropped in an <img> so their several
-// hundred paths can be animated one at a time. Fetched rather than imported,
-// which would put 280KB of markup in the bundle ahead of the first paint —
-// and the screen cannot start until they are here, because they are the
-// screen.
+// The design's own background: the pen sketch bled to all four edges, built
+// out of Figma by scripts/build-loading-sketch.mjs. It is inlined rather than
+// dropped in an <img> so its thousand paths can be animated one at a time —
+// which is the whole point of it, and what a flat picture of the same drawing
+// could not do. Fetched rather than imported, which would put the markup in
+// the bundle ahead of the first paint; and the screen cannot start until it is
+// here, because it is the screen.
 //
-// The design stands the copy in the left quarter of the frame and gives the
-// aircraft the rest, so both of these are to the right of it: they sweep
-// together, over the bar's own span, so the pen and the bar finish on the
-// same beat.
-const blueprints = [
-  { name: "left", url: leftUrl, at: 0, drawMs: LOAD_MS },
-  { name: "right", url: rightUrl, at: 0, drawMs: LOAD_MS },
-];
+// One sweep, left to right across the page, over the bar's own span — so the
+// pen and the bar finish on the same beat.
+const artwork = [{ name: "sketch", url: sketchUrl, at: 0, drawMs: LOAD_MS }];
 
 // The screen stands finished once the bar fills — drawings whole, nothing
 // moving — before anything starts to leave.
@@ -101,7 +97,7 @@ function sweepSteps(markup) {
 // which replaces every path with a new element and restarts every line's
 // animation, sixty times a second. Nothing here depends on the progress, so
 // the cheapest fix is for it never to re-render at all.
-const Blueprint = memo(function Blueprint({
+const Drawing = memo(function Drawing({
   name,
   url,
   markup,
@@ -119,7 +115,7 @@ const Blueprint = memo(function Blueprint({
     // They all leave together, so this one is the same for each of them.
     "--undraw-step": `${(UNDRAW_MS - LINE_MS) / steps}ms`,
   };
-  const className = `loading__blueprint loading__blueprint--${name}`;
+  const className = `loading__art loading__art--${name}`;
 
   return markup ? (
     <div
@@ -154,8 +150,8 @@ function Loading({ onDone, onExited }) {
   const [leaving, setLeaving] = useState(false);
   const lockupRef = useRef(null);
 
-  // Nothing can be shown until the drawings are here — they are most of what
-  // there is to show, and starting the bar without them would have the pen
+  // Nothing can be shown until the drawing is here — it is most of what
+  // there is to show, and starting the bar without it would have the pen
   // join a sweep already in progress. The hero's first frame is fetched
   // alongside but does not hold the screen up: the sequence runs for seven
   // seconds after this, which is all the head start it needs.
@@ -163,7 +159,7 @@ function Loading({ onDone, onExited }) {
     let live = true;
     preload(heroPoster);
     Promise.all(
-      blueprints.map(({ name, url }) =>
+      artwork.map(({ name, url }) =>
         fetch(url)
           .then((response) => response.text())
           .then((markup) => [name, markup]),
@@ -288,8 +284,8 @@ function Loading({ onDone, onExited }) {
       aria-busy={!leaving}
     >
       {drawings &&
-        blueprints.map(({ name, url, at, drawMs }) => (
-          <Blueprint
+        artwork.map(({ name, url, at, drawMs }) => (
+          <Drawing
             key={name}
             name={name}
             url={url}
