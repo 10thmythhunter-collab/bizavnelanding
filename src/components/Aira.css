@@ -491,6 +491,32 @@
     left: auto;
     right: 0;
   }
+
+  /* Centred. The column is the whole width of the screen here rather than one
+     half of a row, and the burst under it is centred in that width — so a
+     ragged left edge above it reads as two things that failed to line up
+     rather than as a column beside a mark. Everything in the column goes,
+     type and controls alike: the pill, the note under it and the badge are
+     items of this same column, so centring it centres them.
+
+     These are the three declarations the owners variant already uses for the
+     same reason, that one being stacked and centred by design. */
+  .aira__copy {
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Every column in the column. The copy holds a head, an actions block and
+     an app block, and each of those is a flex column of its own with its own
+     alignment — centring only the outer one centres the boxes and leaves what
+     is inside them ranged left. The actions block is the one that shows it:
+     it is as wide as the app note under it, so the pill sat ten pixels left
+     of the axis everything else had lined up on. */
+  .aira__head,
+  .aira__actions,
+  .aira__app {
+    align-items: center;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
