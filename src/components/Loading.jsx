@@ -64,8 +64,10 @@ const FULL_HOLD_MS = 700;
 // becomes one. That standing frame IS the second screen, and it is held.
 //
 // Only then does the camera move in on the first "a" of "bizav" — on the
-// letter, and stopping while it is still a letter — carrying the sky forward
-// under it. The site fades up over that.
+// letter, and stopping while it is still a letter. The photograph goes with
+// the move: the sky washes to the brand's indigo under it, so what the camera
+// arrives at is the mark alone on the brand's own colour. The site fades up
+// over that.
 const UNDRAW_MS = 1200;
 const VANISH_MS = 600;
 // Part way into the un-drawing rather than after it. Waiting for the last line
@@ -89,9 +91,9 @@ const ZOOM_AT = COLOUR_AT + COLOUR_MS + COLOUR_HOLD_MS;
 // Long enough to read as a camera being pushed rather than a jump cut; it
 // settles rather than accelerating, because it is arriving somewhere.
 const ZOOM_MS = 900;
-// It stops on the letter and stands there. Without this the move and the
-// hand-off run together and the frame it was travelling to is never actually
-// seen.
+// It stops on the letter, on the indigo, and stands there. Without this the
+// move and the hand-off run together and the frame it was travelling to is
+// never actually seen.
 const ZOOM_HOLD_MS = 400;
 const EXIT_MS = ZOOM_AT + ZOOM_MS + ZOOM_HOLD_MS;
 
@@ -318,6 +320,13 @@ function Loading({ onDone, onExited }) {
           flicker. After the drawing in the DOM, so it covers it as it comes
           rather than having to be lifted over it. */}
       <img className="loading__photo" src={skyUrl} alt="" aria-hidden="true" />
+
+      {/* What the photograph washes to as the camera moves in. A pane of its
+          own rather than a second turn of the screen's own background: the
+          ground underneath is already doing one colour and cannot cleanly be
+          given a second, and this has to come up OVER the photograph, which
+          sits above that ground. */}
+      <div className="loading__wash" aria-hidden="true" />
 
       <div className="loading__copy">
         {/* The one thing that survives the exit, so it is a sibling of

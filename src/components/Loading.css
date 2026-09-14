@@ -17,6 +17,10 @@
      token, because the ground, the keyframe that takes it there and the pane
      that lands the dive must not be able to drift apart. */
   --sky: #0e699d;
+  /* And what it all washes to as the camera moves in on the letter: the
+     brand's indigo, the colour the frame is standing in when the site takes
+     it. */
+  --brand: #2b2b8b;
   /* Where the camera stops on the "a" — see @keyframes loading-zoom. It is a
      token because the letter is very nearly square and the window is not: on
      a wide frame the height is what runs out first, and on a phone held
@@ -418,6 +422,31 @@
   }
   to {
     transform: scale(1.28);
+  }
+}
+
+/* The wash. It comes up over the photograph on the move's own clock, so the
+   sky is gone by the time the camera settles and what is left standing is the
+   mark on the brand's colour — which is also a colour the site can be handed
+   from, where a photograph of a noon sky is not. Above the photograph by
+   document order; under the mark, which lifts itself on z-index. */
+.loading__wash {
+  position: absolute;
+  inset: 0;
+  background-color: var(--brand);
+  opacity: 0;
+}
+
+.loading[data-stage="exit"] .loading__wash {
+  animation: loading-wash var(--zoom-ms) ease-in-out var(--zoom-at) both;
+}
+
+@keyframes loading-wash {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
