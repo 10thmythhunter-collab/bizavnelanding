@@ -17,13 +17,21 @@
      token, because the ground, the keyframe that takes it there and the pane
      that lands the dive must not be able to drift apart. */
   --sky: #0e699d;
+  /* Where the camera stops on the "a" — see @keyframes loading-zoom. It is a
+     token because the letter is very nearly square and the window is not: on
+     a wide frame the height is what runs out first, and on a phone held
+     upright it is the width, by a long way. One number per shape of window,
+     each picked so the whole glyph is still inside the frame. */
+  --letter-scale: 24;
   /* The sketch is bled past every edge of the frame, and the logo is scaled a
      couple of hundred times over on the way out; the screen crops both, it
      does not grow to fit them. */
   overflow: hidden;
+  /* HANDOVER_MS in Loading.jsx. The two have to agree: the component unmounts
+     on its own clock and this is what it is waiting for. */
   transition:
-    opacity 400ms ease,
-    visibility 0s linear 400ms;
+    opacity 600ms ease,
+    visibility 0s linear 600ms;
 }
 
 .loading[data-leaving] {
@@ -227,6 +235,13 @@
    frame. The drawing stays: it is bled and cropped either way, and it is the
    paper the screen is printed on. */
 @media (max-width: 900px) {
+  /* The letter has to clear the width now, not the height: upright, the frame
+     is narrower than the glyph is at the landscape scale, and a glyph cropped
+     on both sides is exactly the round hole the move is trying not to be. */
+  .loading {
+    --letter-scale: 14;
+  }
+
   .loading__copy {
     left: 6%;
     right: 6%;
@@ -298,15 +313,17 @@
 .loading[data-stage="exit"] .loading__lockup {
   position: relative;
   z-index: 1;
-  /* The eye of the first "a", the one in "bizav" — the counter, not the ink
-     around it: a circle of radius 5.08 centred on 114.86, 27.07 of the
-     asset's own 172x54. Scaling about that point keeps it nailed to the
-     middle of the frame, so the ring opens past all four edges and what is
-     left standing is the sky the letter was cut out of. Aiming at the stroke
-     instead would end the dive on solid white, and the site behind this is a
-     night skyline — the frame has to arrive on something it can hand over
-     from, not blow out to paper first. */
-  transform-origin: 66.78% 50.13%;
+  /* The middle of the first "a", the one in "bizav": its outline runs
+     105.5-124.5 across and 17.8-36.3 down the asset's own 172x54, so the
+     centre of the glyph is 115.0, 27.05. Scaling about that point keeps the
+     letter nailed to the middle of the frame while it grows.
+
+     Note what it must NOT be aimed at. This "a" is a geometric one — a circle
+     with a stem — and its counter is a perfect round hole. Push far enough
+     into that hole and every edge of the letter has left the frame, so what
+     is left growing is a circle, and a circle reads as an "o". The letter has
+     to still be a letter when the camera stops. */
+  transform-origin: 66.86% 50.09%;
   animation:
     /* Waits out the un-drawing: the screen is empty but for the logo before
        it moves. */
@@ -314,7 +331,7 @@
       both,
     /* Forwards-only: a "both" fill would apply its start state during the
        delay and cancel the walk before it ran. */
-    loading-zoom var(--zoom-ms) cubic-bezier(0.55, 0, 1, 0.45) var(--zoom-at)
+    loading-zoom var(--zoom-ms) cubic-bezier(0.33, 0, 0.15, 1) var(--zoom-at)
       forwards,
     /* Black to white, on the same clock as the ground it stands on. An
        inversion rather than a second asset: the mark is one flat ink on
@@ -337,33 +354,36 @@
    and arriving at that size are one move.
 
    The second translate in each of these is the correction the origin costs.
-   Everything here scales about the eye of the "a" rather than the middle of
-   the box, which drags the box off centre by (0.5 - origin) x (1 - scale) of
-   its own width — so that is what is given back, and at the end of the dive
-   the whole of it is given back instead, which puts the eye itself dead
-   centre. */
+   Everything here scales about the "a" rather than the middle of the box,
+   which drags the box off centre by (0.5 - origin) x (1 - scale) of its own
+   width — so that is what is given back, and at the end of the move the whole
+   of it is given back instead, which puts the letter itself dead centre. */
 
 @keyframes loading-center {
   from {
     transform: translate(0, 0) scale(1);
   }
   to {
-    transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.215%, 0)
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.236%, 0)
       scale(1.2512);
   }
 }
 
 @keyframes loading-zoom {
   from {
-    transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.215%, 0)
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.236%, 0)
       scale(1.2512);
   }
   to {
-    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-16.78%, 0)
-      /* The counter is some 6px across at rest. 250 opens it to a couple of
-         thousand of radius, which clears the corner of a 1440x810 frame — 826
-         away — with room for the taller and wider ones. */
-      scale(250);
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-16.86%, 0)
+      /* Where the move stops. The glyph stands 23.1px tall at the lockup's
+         own layout width, so the default twenty-four puts it at about four
+         fifths of a landscape frame — big enough to be the only thing the
+         shot is about, with its neighbours falling away at the edges, and
+         short of the scale at which the glyph's own outline leaves the frame
+         and the round hole in it becomes the subject, which is the whole
+         thing this move must not look like. */
+      scale(var(--letter-scale));
   }
 }
 
@@ -379,7 +399,7 @@
 .loading[data-stage="exit"] .loading__photo {
   animation:
     loading-sky var(--colour-ms) ease-in-out var(--colour-at) both,
-    loading-push var(--zoom-ms) cubic-bezier(0.55, 0, 1, 0.45) var(--zoom-at)
+    loading-push var(--zoom-ms) cubic-bezier(0.33, 0, 0.15, 1) var(--zoom-at)
       forwards;
 }
 

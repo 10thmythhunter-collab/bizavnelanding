@@ -63,9 +63,9 @@ const FULL_HOLD_MS = 700;
 // aircraft, same pose, so the drawing does not dissolve into a picture, it
 // becomes one. That standing frame IS the second screen, and it is held.
 //
-// Only then does the camera dive into the eye of the "a" of "bizav", carrying
-// the sky forward with it, until the letter has opened past every edge and
-// the site is handed a frame that is already flying.
+// Only then does the camera move in on the first "a" of "bizav" — on the
+// letter, and stopping while it is still a letter — carrying the sky forward
+// under it. The site fades up over that.
 const UNDRAW_MS = 1200;
 const VANISH_MS = 600;
 // Part way into the un-drawing rather than after it. Waiting for the last line
@@ -86,16 +86,20 @@ const COLOUR_MS = 600;
 // length of one before the camera moves again.
 const COLOUR_HOLD_MS = 900;
 const ZOOM_AT = COLOUR_AT + COLOUR_MS + COLOUR_HOLD_MS;
-const ZOOM_MS = 600;
-// The ring is off every edge by the end of the dive and what is left standing
-// is the photograph, pushed in under it. Long enough to register as a frame
-// before the site takes it.
-const ZOOM_HOLD_MS = 200;
+// Long enough to read as a camera being pushed rather than a jump cut; it
+// settles rather than accelerating, because it is arriving somewhere.
+const ZOOM_MS = 900;
+// It stops on the letter and stands there. Without this the move and the
+// hand-off run together and the frame it was travelling to is never actually
+// seen.
+const ZOOM_HOLD_MS = 400;
 const EXIT_MS = ZOOM_AT + ZOOM_MS + ZOOM_HOLD_MS;
 
-// The site is already painted behind the loader by then; this is only the
-// cover coming off.
-const HANDOVER_MS = 400;
+// The site is already painted behind the loader by then; this is the cover
+// coming off, and it is a fade rather than a cut — long enough to read as the
+// site arriving over the letter. Matches .loading's own transition in the
+// stylesheet, which has to be given the same number by hand.
+const HANDOVER_MS = 600;
 
 // Read once, when the markup lands: every path carries its place in the
 // drawing's own sweep, so the last place is how many steps that sweep has —
