@@ -26,6 +26,14 @@
      so the hole and the frame grow together and this clears the corner of any
      of them. */
   --dive-scale: 250;
+  /* How far past the left edge of the frame the box the drawing and the
+     photograph are cropped into is allowed to reach. Nothing here, so the
+     composition is shown as drawn; see the phone breakpoint for why it is not
+     nothing there. Held as a positive length and negated where it is used:
+     folded in already negative it would produce "100% - -71vh" in the width
+     below, which is not valid arithmetic and silently drops the whole
+     declaration. */
+  --art-overhang: 0px;
   /* The sketch is bled past every edge of the frame, and the logo is scaled a
      couple of hundred times over on the way out; the screen crops both, it
      does not grow to fit them. */
@@ -53,11 +61,21 @@
    off. How far back it sits is the group opacity Figma holds it at, carried
    through in the asset — nothing here dims it further. */
 
+/* Both pictures are cropped into this box rather than into the frame, and on
+   a phone the box reaches out past the frame's left edge — see the breakpoint.
+   Sliding the picture itself does not work and is worth saying why: an inline
+   svg held at slice, and an <img> held at cover, are each exactly the size of
+   their own element with the overspill already clipped inside it, so there is
+   nothing there to slide into. Moving the element moves the hole it is seen
+   through with it and takes the picture off the screen. Moving the box is
+   what moves the crop. */
 .loading__art {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * var(--art-overhang));
+  right: 0;
+  width: auto;
 }
 
 /* The sketch is drawn on a 1431x705 page and the window is whatever it is.
@@ -82,11 +100,24 @@
    has the whole load and the whole hold to fetch and decode it: it gets one
    chance to arrive, on the same 600ms as the logo's walk, and a decode at
    that moment would be a visible hitch. */
+/* The same box as the drawing, off the same token, so the two are cropped
+   alike and stay registered through the dissolve. */
 .loading__photo {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  top: 0;
+  left: calc(-1 * var(--art-overhang));
+  /* Measured out rather than pinned to both edges. This is an <img>, and an
+     absolutely positioned replaced element does not stretch between a left and
+     a right the way the drawing's <div> does — it keeps its own size and sits
+     at the left, which put the whole photograph off the side of the screen.
+     So it is given the width the box works out to instead. */
+  width: calc(100% + var(--art-overhang));
   height: 100%;
+  /* The stylesheet caps every image and svg at the width of its container, so
+     that width would otherwise be handed straight back — which is what put the
+     photograph in a 390px box hanging off the left of a phone screen while the
+     drawing beside it, being a <div>, took the full box. */
+  max-width: none;
   /* Drawn on a 16:9 frame and shown on whatever the window is; cover, so the
      sky reaches every edge and the frame takes the difference out of the
      cloud at the bottom, the way the design's own crop does. */
@@ -238,6 +269,24 @@
    frame. The drawing stays: it is bled and cropped either way, and it is the
    paper the screen is printed on. */
 @media (max-width: 900px) {
+  /* Both pictures are twice as wide as they are tall and a phone is the other
+     way about, so the frame throws away most of their width and keeps the
+     middle — which is wing and engine, with the cabin off the right-hand edge
+     of the crop entirely.
+
+     So the box they are cropped into is let out past the left of the frame.
+     The picture then centres itself in a box wider than the screen, and the
+     screen is looking at the right-hand end of it: the cabin comes in, and
+     nothing can uncover, because the box still reaches both edges of the
+     frame whatever this is set to.
+
+     In vh because the crop is driven by height — the picture is scaled to
+     cover the frame's height and its width follows — so the same number holds
+     as phones get taller or shorter. */
+  .loading {
+    --art-overhang: 71vh;
+  }
+
   .loading__copy {
     left: 6%;
     right: 6%;
