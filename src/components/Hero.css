@@ -817,9 +817,17 @@
      sentence and the chips that finish it are one thought; the numbers under
      them are a separate claim, and at this width they are a block of four
      rather than a single line, so they need a little air to stop reading as
-     a fourth line of the paragraph above. */
+     a fourth line of the paragraph above.
+
+     More air than that now the stack hangs from the top: 12px was measured
+     against a block sitting on the floor of the screen, where whatever was
+     left over showed above it. Hung from the top the leftover shows below
+     instead, and there is a lot of it — 278px of photograph under the stats
+     at 390x844 with the four of them still crowding the line above. This
+     spends some of it on the one gap in the stack that was carrying the
+     least. */
   .hero__stats {
-    margin-top: 0.75rem;
+    margin-top: 3.5rem;
   }
 
   .hero__stat-value {
