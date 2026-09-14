@@ -894,34 +894,51 @@
 }
 
 /* The stats break where they actually stop fitting, not with the rest of the
-   phone layout: at the sizes above, four across and their rules measure
-   421px, so they hold the row the design puts them in — one line, four
+   phone layout: the row holds the shape the design gives it — one line, four
    columns — well below where the rest of this section goes to its phone
    layout. The break is set where about fifty pixels of slack are left rather
    than at the width where they last fit exactly: a font rendering a little
-   wider on someone else's device should cost nothing, not drop the fourth
-   stat onto a line of its own. */
-@media (max-width: 520px) {
-  /* Two and two. Four across has never fitted on a phone — at 375 the row
-     needs 440px — so the choice is between shrinking them, hiding one behind
-     a swipe, or breaking the row. Breaking it is the only one that keeps all
-     four legible and in front of the reader: these are the numbers the page
-     is asking to be believed on, read once on the way past and never
-     returned to, and the one that would fall off the end of a swipe is the
-     strongest of them. A sideways drag here would also start at the very
-     edge of the screen, where iOS reads it as a back gesture.
+   wider on someone else's device should cost nothing.
 
-     Each stat centred in its own column, with the pair centred under the
-     copy — the block is part of the centred stack above it, not a table
-     hanging off one edge of it. */
+   Measured rather than reckoned, which moved it. The row was taken to be
+   421px on the grounds of four 75px columns and their rules, and 75 is a
+   minimum rather than a width — the fourth stat's label is a sentence and it
+   comes out 251 across, so the row is 536 and wants 584 of window. Set at
+   520 the band from there to 584 was still on the flex row, wrapping the
+   fourth onto a line of its own and leaving its rule hanging in the open air
+   beside it with nothing on the other side. It fits from 590 up; this is
+   that plus the slack. */
+@media (max-width: 640px) {
+  /* Three across and the fourth under them. Four across has never fitted on
+     a phone — at 375 the row needs 440px — so the row has to break
+     somewhere, and this is where it wants to: the first three are a word
+     against a number and sit happily in a third of the width each, while the
+     fourth is a sentence against a number and is the one that cannot. Two
+     and two split them down the middle instead, which put that sentence in
+     half a screen and broke it over four lines, and left the strongest
+     figure on the page reading as one of a pair rather than as the line the
+     three above it are building to.
+
+     The alternatives were worse: shrinking all four to fit costs the
+     legibility these numbers exist for, and hiding one behind a swipe would
+     hide this one — read once on the way past and never returned to — behind
+     a drag that starts at the very edge of the screen, where iOS takes it
+     for a back gesture.
+
+     Each stat centred in its own column and the block centred under the
+     copy: it is part of the centred stack above it, not a table hanging off
+     one edge of it. */
   .hero__stats {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
     justify-content: center;
     column-gap: var(--stat-gap);
-    /* Wider than the gap between the columns, so the rows read as rows. */
-    row-gap: 1.25rem;
+    /* Twice the gap between the columns, and then some. The fourth has to
+       read as set down under the three rather than as a fourth column that
+       wrapped onto a second line, and at anything near the column gap that is
+       exactly what it reads as. */
+    row-gap: 2.5rem;
   }
 
   .hero__stat {
@@ -930,14 +947,21 @@
     text-align: center;
   }
 
-  /* Between the columns only. The + selector would put one down the left of
-     the third stat too, which in a grid is the start of the second row — a
-     rule hanging in the open air under the first column. */
+  /* The full width, so the sentence under it breaks where the measure wants
+     rather than where a third of the screen forces it. */
+  .hero__stat:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+
+  /* Between the three across and nowhere else. The + selector would also put
+     one down the left of the fourth, which has nothing beside it to be
+     divided from — a rule hanging in the open under the first column. */
   .hero__stat + .hero__stat::before {
     content: none;
   }
 
-  .hero__stat:nth-child(even)::before {
+  .hero__stat:nth-child(2)::before,
+  .hero__stat:nth-child(3)::before {
     content: "";
   }
 }
