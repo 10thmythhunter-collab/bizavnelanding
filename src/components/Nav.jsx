@@ -281,17 +281,20 @@ function Nav({ audience, onRequestDemo }) {
                     }}
                     aria-hidden="true"
                   >
-                    <svg
-                      className="nav__annotation-bracket"
-                      viewBox="0 0 215 32"
-                      preserveAspectRatio="none"
-                      focusable="false"
-                    >
-                      {/* Drawn from the left stub, across, then up the
-                              right one — which is what makes the dash sweep
-                              read left to right. */}
-                      <path d="M0.5 0V32H214.5V0" pathLength="100" />
-                    </svg>
+                    {/* Three boxes rather than one stroked path. The path
+                        was drawn by running a dash along it, and a dash is
+                        measured against the path as *rendered* — this box is
+                        stretched to whatever width the three links come to,
+                        so once they grew (the marks beside them did it) the
+                        rendered path outran the length the dash was cut to
+                        and the last segment, the right-hand stub, simply
+                        stopped being painted. Boxes have no such arithmetic:
+                        each one is uncovered in turn, at any width. */}
+                    <span className="nav__annotation-bracket">
+                      <span className="nav__annotation-stub nav__annotation-stub--left" />
+                      <span className="nav__annotation-rule" />
+                      <span className="nav__annotation-stub nav__annotation-stub--right" />
+                    </span>
 
                     <svg
                       className="nav__annotation-arrow"
@@ -311,8 +314,12 @@ function Nav({ audience, onRequestDemo }) {
                 )}
               </li>
 
+              {/* Divided from the three above it: those are the products,
+                  this is not one of them, and in a single row of six words
+                  nothing else says so. The rule itself is drawn in CSS — see
+                  .nav__divided. */}
               {links.map(({ label, href }) => (
-                <li key={label}>
+                <li className="nav__divided" key={label}>
                   <a className="nav__link" href={href}>
                     <LinkBody label={label} />
                   </a>

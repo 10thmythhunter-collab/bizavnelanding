@@ -728,6 +728,31 @@
 /* --- responsive --- */
 
 @media (max-width: 700px) {
+  /* Centred, the way a phone hero is: with one column and no photograph to
+     hang the copy off, a left-aligned block leaves a ragged column of white
+     down the right of the screen and nothing to balance it. The switch above
+     it and the row of stats below go with it — the whole thing reads as one
+     centred stack rather than a centred headline over a left-aligned
+     everything else. */
+  .hero__content,
+  .hero__panel {
+    align-items: center;
+  }
+
+  .hero__title,
+  .hero__subtitle-text {
+    text-align: center;
+  }
+
+  /* Both are rows that wrap: the sentence with its chips, and the chips
+     among themselves. Centred, a line that wraps stays under the middle of
+     the one above it. */
+  .hero__subtitle,
+  .hero__products,
+  .hero__stats {
+    justify-content: center;
+  }
+
   /* Below this width the Figma line break stops being useful — let the
      headline wrap on its own and balance the resulting lines. */
   .hero__title span {
@@ -799,22 +824,23 @@
      strongest of them. A sideways drag here would also start at the very
      edge of the screen, where iOS reads it as a back gesture.
 
-     Aligned to the start rather than centred, so both columns hang off the
-     headline's own left edge and a label that needs two lines breaks against
-     a straight edge instead of going ragged on both sides. */
+     Each stat centred in its own column, with the pair centred under the
+     copy — the block is part of the centred stack above it, not a table
+     hanging off one edge of it. */
   .hero__stats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
+    justify-content: center;
     column-gap: var(--stat-gap);
     /* Wider than the gap between the columns, so the rows read as rows. */
     row-gap: 1.25rem;
   }
 
   .hero__stat {
-    align-items: flex-start;
+    align-items: center;
     min-width: 0;
-    text-align: left;
+    text-align: center;
   }
 
   /* Between the columns only. The + selector would put one down the left of
