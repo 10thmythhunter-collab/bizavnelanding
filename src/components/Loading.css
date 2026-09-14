@@ -1,23 +1,25 @@
-/* One screen, one clock. The composition is the design's 1440x705 frame, and
-   it holds together only as a whole — so every measure in it, across and down
-   alike, is a share of the viewport width, and the block is centred on the
-   vertical rather than pinned to a share of a height that scales on its own.
-   The loader covers an empty page, so there is no scrollbar to put vw and the
-   container's own width out of step. */
+/* One screen, one clock. The composition is the design's 1440x705 frame
+   ("Loading stage final — layout v2"), and it holds together only as a whole —
+   so every measure in it, across and down alike, is a share of the viewport
+   width, and the block is centred on the vertical rather than pinned to a
+   share of a height that scales on its own. The loader covers an empty page,
+   so there is no scrollbar to put vw and the container's own width out of
+   step. */
 
 .loading {
   position: fixed;
   inset: 0;
   z-index: 100;
   background-color: #ffffff;
-  /* The colour the ground turns once the drawing is gone — the same indigo
-     the strip under the hero carries, so the first colour of the site is a
-     colour the site already has. One token: the ground, the pane that lands
-     the dive and the keyframe between them must not be able to drift. */
-  --brand: #2b2b8b;
-  /* The two aircraft are placed to run off the edges of the frame, and the
-     logo is scaled a hundred-odd times over on the way out; the screen crops
-     both, it does not grow to fit them. */
+  /* What the ground turns once the drawing is gone: the sky of the design's
+     second screen, which is a photograph of a jet above cloud — this is its
+     own blue, averaged off the band of sky across the top of that frame. One
+     token, because the ground, the keyframe that takes it there and the pane
+     that lands the dive must not be able to drift apart. */
+  --sky: #0e699d;
+  /* The two aircraft are placed to run off the edge of the frame, and the
+     logo is scaled a couple of hundred times over on the way out; the screen
+     crops both, it does not grow to fit them. */
   overflow: hidden;
   transition:
     opacity 400ms ease,
@@ -35,9 +37,11 @@
 /* --- the drawings ---
    Each is swept over one line at a time while the bar fills. Every path
    carries the place it holds along that sweep, written into the asset itself,
-   and turns up that many steps after the front sets off. The two run together
-   and outward from the copy, each drawn away from the middle towards the edge
-   it stands nearest. */
+   and turns up that many steps after the front sets off.
+
+   The design stands the copy in the left quarter and gives the aircraft
+   everything to the right of it, so both drawings are over there, side by
+   side, clear of the text. */
 
 .loading__blueprint {
   position: absolute;
@@ -46,23 +50,26 @@
      by the rule below. */
   height: auto;
   transform: translateY(-50%);
-  /* How far back the drawings sit. They come out of Figma at 0.4 and this
-     takes them a little further; it is on the drawing rather than baked into
-     the asset so it stays a number to turn, and it multiplies each line's own
-     fade rather than fighting it. */
+  /* How far back the drawings sit. The design's own background is a pen
+     sketch washed nearly into the paper; this is the line weight's share of
+     that. It is on the drawing rather than baked into the asset so it stays a
+     number to turn, and it multiplies each line's own fade rather than
+     fighting it. */
   opacity: 0.8;
 }
 
-/* Straight off the design frame, in a 1440x705 screen: the aircraft stand
-   clear of both edges, 470 across at x=10 and at x=960. */
+/* The copy runs to 32.5vw. These start just past it and carry to the right
+   edge and over it — the design's own aircraft is cropped by that edge rather
+   than fitted inside it, and the weight of the frame sits right of centre
+   because of it. */
 .loading__blueprint--left {
-  left: 0.694vw;
-  width: 32.639vw;
+  left: 33vw;
+  width: 32vw;
 }
 
 .loading__blueprint--right {
-  left: 66.667vw;
-  width: 32.639vw;
+  left: 66.5vw;
+  width: 35vw;
 }
 
 .loading__blueprint svg {
@@ -88,25 +95,28 @@
 }
 
 /* --- the copy ---
-   550 wide at x=445, a centred column of logo, headline and bar on even 32px
-   gaps. It is there from the first frame: the bar has to report from the
-   first frame, and the column reads as one block with it. */
+   348 wide at x=120, ranged left: logo, headline, then the bar 56 below it.
+   It is there from the first frame — the bar has to report from the first
+   frame, and the column reads as one block with it.
+
+   Placed by the top of the logo rather than the top of the design's own box,
+   which opens with a 40 spacer: 217 down the 705 frame is 135.5 above its
+   middle, and the middle is the one line that holds when the frame doesn't. */
 
 .loading__copy {
   position: absolute;
-  left: 30.903vw;
-  top: calc(50% - 12.213vw);
-  width: 38.194vw;
+  left: 8.333vw;
+  top: calc(50% - 9.41vw);
+  width: 24.167vw;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2.222vw;
+  align-items: flex-start;
 }
 
 .loading__lockup {
   display: block;
-  /* 170 of 1440 across. */
-  width: 11.806vw;
+  /* 215 of 1440 across. */
+  width: 14.931vw;
   height: auto;
   max-width: none;
 }
@@ -114,12 +124,12 @@
 .loading__headline {
   margin: 0;
   font-weight: 400;
-  /* 56px at the design width, on the family's own leading. */
-  font-size: clamp(1.75rem, 3.889vw, 3.5rem);
-  line-height: 1.3;
-  letter-spacing: -0.025em;
+  /* 60px at the design width, on its own 64px leading. */
+  font-size: clamp(1.75rem, 4.167vw, 3.75rem);
+  line-height: 1.0667;
+  letter-spacing: -0.015em;
   color: #000000;
-  text-align: center;
+  text-align: left;
 }
 
 .loading__line {
@@ -127,60 +137,52 @@
 }
 
 /* --- the bar ---
-   370 wide, 6px above its status line. */
+   348 wide, 14 above the line that reads it out. */
 
 .loading__group {
+  /* The design's own gap 56, off the headline's last line. */
+  margin-top: 3.889vw;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  width: min(25.694vw, calc(100% - 3rem));
-}
-
-.loading__bar {
-  position: relative;
-  /* Tall enough for the plane, which overhangs the track on both sides. */
-  height: 24px;
-  display: flex;
-  align-items: center;
+  gap: 14px;
+  width: min(24.167vw, 100%);
 }
 
 .loading__track {
   width: 100%;
   height: 2px;
-  border-radius: 2px;
-  background-color: rgba(0, 0, 0, 0.12);
+  border-radius: 1px;
+  background-color: rgba(15, 15, 15, 0.12);
   overflow: hidden;
 }
 
 .loading__fill {
   width: calc(var(--progress, 0) * 100%);
   height: 100%;
-  border-radius: 2px;
-  background-color: rgba(65, 65, 65, 0.45);
+  border-radius: 1px;
+  background-color: #171717;
 }
 
-.loading__plane {
-  position: absolute;
-  top: 0;
-  /* Rides the tip of the fill. The floor keeps it from hanging off the left
-     end in the first frames, before there is any fill to ride. */
-  left: max(12px, calc(var(--progress, 0) * 100%));
-  width: 24px;
-  height: 24px;
-  transform: translateX(-50%);
+/* The label on the left, the figure hard against the right end of the track,
+   the way the design sets them. */
+.loading__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.875rem;
+  line-height: 20px;
 }
 
 .loading__status {
   /* All the lines share one cell: the block is one line tall and as wide as
      the longest message, so nothing shifts as they cycle. */
   display: grid;
-  justify-items: center;
+  justify-items: start;
   margin: 0;
   font-weight: 400;
-  font-size: 0.875rem;
-  line-height: 20px;
-  color: rgba(0, 0, 0, 0.55);
-  text-align: center;
+  color: #6b7078;
+  text-align: left;
 }
 
 .loading__message {
@@ -207,11 +209,20 @@
   transform: translateY(8px);
 }
 
+.loading__percent {
+  flex-shrink: 0;
+  font-weight: 500;
+  color: #171717;
+  /* The figure is read right to left as it climbs, and a tabular cell keeps
+     the three widths it passes through from shuffling the label beside it. */
+  font-variant-numeric: tabular-nums;
+}
+
 /* Below the design's proportions the aircraft and the copy stop fitting side
    by side. */
 @media (max-width: 900px) {
-  /* The aircraft need the full frame to stand either side of the copy, and
-     there isn't one; the copy has the screen to itself. */
+  /* The aircraft need the right two thirds of the frame to stand clear of the
+     copy, and there isn't one; the copy has the screen to itself. */
   .loading__blueprint--left,
   .loading__blueprint--right {
     display: none;
@@ -223,24 +234,25 @@
     top: 50%;
     width: auto;
     transform: translateY(-50%);
-    gap: 1.5rem;
   }
 
   .loading__lockup {
-    width: min(170px, 45%);
+    width: min(215px, 55%);
   }
 
   .loading__group {
-    width: min(370px, 100%);
+    margin-top: 2rem;
+    width: 100%;
   }
 }
 
 /* --- the exit ---
    The drawings retreat the way they came while everything but the logo
    softens out of focus — together, not one after the other. Then the logo
-   walks to the middle of the screen, holds a beat, and the frame dives into
-   the "a" of .ai. --dx and --dy are measured in JS, because where the logo
-   starts depends on where the copy wrapped.
+   walks to the middle of the screen and grows to the size the design's second
+   screen draws it at, the ground turns to that screen's sky under it, and the
+   frame dives into the eye of the "a" in "bizav". --dx and --dy are measured
+   in JS, because where the logo starts depends on where the copy wrapped.
 
    Nothing here may reuse a keyframe name the element is already running: same
    name means the browser updates that animation instead of starting one, and
@@ -290,9 +302,9 @@
      around it: a circle of radius 5.08 centred on 114.86, 27.07 of the
      asset's own 172x54. Scaling about that point keeps it nailed to the
      middle of the frame, so the ring opens past all four edges and what is
-     left standing is the ground the letter was cut out of. Aiming at the
-     stroke instead would end the dive on solid white, and the site behind
-     this is a night skyline — the frame has to arrive in the brand's colour,
+     left standing is the sky the letter was cut out of. Aiming at the stroke
+     instead would end the dive on solid white, and the site behind this is a
+     night skyline — the frame has to arrive in a colour it can hand over in,
      not blow out to paper first. */
   transform-origin: 66.78% 50.13%;
   animation:
@@ -320,34 +332,44 @@
   }
 }
 
+/* The walk, and the growth that comes with it: the design draws the mark 215
+   across on the first screen and 269 on the second, so arriving in the middle
+   and arriving at that size are one move.
+
+   The second translate in each of these is the correction the origin costs.
+   Everything here scales about the eye of the "a" rather than the middle of
+   the box, which drags the box off centre by (0.5 - origin) x (1 - scale) of
+   its own width — so that is what is given back, and at the end of the dive
+   the whole of it is given back instead, which puts the eye itself dead
+   centre. */
+
 @keyframes loading-center {
   from {
-    transform: translate(0, 0);
+    transform: translate(0, 0) scale(1);
   }
   to {
-    transform: translate(var(--dx, 0), var(--dy, 0));
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.215%, 0)
+      scale(1.2512);
   }
 }
 
 @keyframes loading-zoom {
   from {
-    transform: translate(var(--dx, 0), var(--dy, 0)) scale(1);
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.215%, 0)
+      scale(1.2512);
   }
   to {
-    /* The second translate is a share of the logo's own width, which pulls
-       the focal point from where it sits in the wordmark to dead centre:
-       whatever the origin is past the halfway mark, given back. */
     transform: translate(var(--dx, 0), var(--dy, 0)) translate(-16.78%, 0)
-      /* The counter is 5px across at rest. 200 opens it to some 1000px of
-         radius, which clears the corner of a 1440x810 frame — 826 away — with
-         room for the taller and wider ones. */
-      scale(200);
+      /* The counter is some 6px across at rest. 250 opens it to a couple of
+         thousand of radius, which clears the corner of a 1440x810 frame — 826
+         away — with room for the taller and wider ones. */
+      scale(250);
   }
 }
 
-/* The ground turns. White paper for the drawing and the bar, then the brand's
-   own colour once the drawing is gone and only the mark is left standing on
-   it. */
+/* The ground turns. White paper for the drawing and the bar, then the sky of
+   the design's second screen once the drawing is gone and only the mark is
+   left standing on it. */
 .loading[data-stage="exit"] {
   animation: loading-colour var(--colour-ms) ease-in-out var(--colour-at) both;
 }
@@ -357,21 +379,21 @@
     background-color: #ffffff;
   }
   to {
-    background-color: var(--brand);
+    background-color: var(--sky);
   }
 }
 
-/* The dive ends inside the letter, on the ground showing through it — so
-   what the frame is holding by then is already flat brand colour. This lays
-   the same colour over the top under cover of the zoom's second half, which
-   takes the ring's last edge and any seam at it off the screen a beat before
-   the site is handed the frame. It is the surface the site fades up through,
-   which is why it is the ground's colour and not the mark's. */
+/* The dive ends inside the letter, on the ground showing through it — so what
+   the frame is holding by then is already flat sky. This lays the same colour
+   over the top under cover of the zoom's second half, which takes the ring's
+   last edge and any seam at it off the screen a beat before the site is
+   handed the frame. It is the surface the site fades up through, which is why
+   it is the ground's colour and not the mark's. */
 .loading__ink {
   position: absolute;
   inset: 0;
   z-index: 2;
-  background-color: var(--brand);
+  background-color: var(--sky);
   animation: loading-ink var(--ink-ms) ease-in var(--ink-at) both;
 }
 
@@ -413,8 +435,8 @@
 
   /* No dive: the ground simply fills under the standing logo. The turn from
      black to white stays — this rule replaces the whole shorthand, and the
-     ground it is standing on goes to indigo either way, so dropping it would
-     leave a black mark on a dark blue screen. */
+     ground it is standing on goes to sky either way, so dropping it would
+     leave a black mark on a blue screen. */
   .loading[data-stage="exit"] .loading__lockup {
     animation:
       loading-center var(--lift-ms) ease-out var(--lift-at) both,

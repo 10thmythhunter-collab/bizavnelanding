@@ -3,7 +3,6 @@ import leftUrl from "../assets/blueprint-left.svg";
 import rightUrl from "../assets/blueprint-right.svg";
 import lockup from "../assets/bizavLockup.svg";
 import heroPoster from "../assets/hero-skyline.jpg";
-import plane from "../assets/plane-progress.svg";
 import "./Loading.css";
 
 // The first line is the design's; the rest carry the same voice. The bar is
@@ -43,8 +42,10 @@ const LINE_MS = 400;
 // and the screen cannot start until they are here, because they are the
 // screen.
 //
-// Both sweep outward from the copy in the middle, together, over the bar's own
-// span — so the pen and the bar finish on the same beat.
+// The design stands the copy in the left quarter of the frame and gives the
+// aircraft the rest, so both of these are to the right of it: they sweep
+// together, over the bar's own span, so the pen and the bar finish on the
+// same beat.
 const blueprints = [
   { name: "left", url: leftUrl, at: 0, drawMs: LOAD_MS },
   { name: "right", url: rightUrl, at: 0, drawMs: LOAD_MS },
@@ -55,10 +56,11 @@ const blueprints = [
 const FULL_HOLD_MS = 700;
 
 // The exit, after that. The drawings retreat the way they came while
-// everything but the logo softens out of focus; the logo walks to the middle;
-// the white ground fills with colour as the mark turns from black to white;
+// everything but the logo softens out of focus; the logo walks to the middle
+// and grows to the size the design's second screen draws it at; the white
+// ground fills with that screen's sky as the mark turns from black to white;
 // and then the frame dives into the eye of the "a" of "bizav" until the
-// letter has opened past every edge and only that colour is left.
+// letter has opened past every edge and only that sky is left.
 const UNDRAW_MS = 1200;
 const VANISH_MS = 600;
 const LIFT_AT = UNDRAW_MS;
@@ -67,22 +69,23 @@ const LIFT_MS = 450;
 // one move, not two.
 const COLOUR_AT = LIFT_AT + LIFT_MS;
 const COLOUR_MS = 600;
-// Long enough to be read as a frame of its own: white paper became a brand,
-// and that wants a beat before the camera moves again.
+// Long enough to be read as a frame of its own — it is a frame of its own in
+// the design, and white paper becoming a sky wants a beat before the camera
+// moves again.
 const COLOUR_HOLD_MS = 500;
 const ZOOM_AT = COLOUR_AT + COLOUR_MS + COLOUR_HOLD_MS;
 const ZOOM_MS = 600;
 // The dive lands on the ground showing through the letter, so the frame is
-// already flat brand colour when it gets there; this lays the same colour
-// over the top under cover of the second half of the zoom, which takes the
-// last of the ring off the screen cleanly.
+// already flat sky by the time it gets there; this lays the same colour over
+// the top under cover of the second half of the zoom, which takes the last of
+// the ring off the screen cleanly.
 const INK_AT = ZOOM_AT + ZOOM_MS / 2;
 const INK_MS = ZOOM_MS / 2;
 const INK_HOLD_MS = 200;
 const EXIT_MS = INK_AT + INK_MS + INK_HOLD_MS;
 
-// The site is already painted behind the loader by then, and the loader is
-// one flat brand colour over it; this is only the cover coming off.
+// The site is already painted behind the loader by then, and the loader is one
+// flat colour over it; this is only the cover coming off.
 const HANDOVER_MS = 400;
 
 // Read once, when the markup lands: every path carries its place in the
@@ -256,6 +259,7 @@ function Loading({ onDone, onExited }) {
     messages.length - 1,
     Math.floor(progress * messages.length),
   );
+  const percent = Math.round(progress * 100);
 
   return (
     <div
@@ -309,8 +313,8 @@ function Loading({ onDone, onExited }) {
         <p className="loading__headline">
           {/* Broken by hand: where the line turns is the design's, not
               whatever the measure happens to allow. */}
-          <span className="loading__line">Platform for all</span>
-          <span className="loading__line">workflows</span>
+          <span className="loading__line">Platform for</span>
+          <span className="loading__line">all workflows</span>
         </p>
 
         {/* --progress lives here rather than on the screen: it changes every
@@ -319,39 +323,44 @@ function Loading({ onDone, onExited }) {
             drawings, sixty times a second. */}
         <div className="loading__group" style={{ "--progress": progress }}>
           <div
-            className="loading__bar"
+            className="loading__track"
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={Math.round(progress * 100)}
+            aria-valuenow={percent}
             aria-label="Loading bizav.ai"
           >
-            <div className="loading__track">
-              <div className="loading__fill" />
-            </div>
-            <img className="loading__plane" src={plane} alt="" />
+            <div className="loading__fill" />
           </div>
 
-          <p className="loading__status" role="status">
-            {messages.map((message, index) => (
-              <span
-                className="loading__message"
-                key={message}
-                data-slot={
-                  index === active
-                    ? "current"
-                    : index < active
-                      ? "past"
-                      : "next"
-                }
-                // Only the line on screen belongs in the live region; the
-                // others would all be read out at once.
-                aria-hidden={index === active ? undefined : true}
-              >
-                {message}
-              </span>
-            ))}
-          </p>
+          <div className="loading__row">
+            <p className="loading__status" role="status">
+              {messages.map((message, index) => (
+                <span
+                  className="loading__message"
+                  key={message}
+                  data-slot={
+                    index === active
+                      ? "current"
+                      : index < active
+                        ? "past"
+                        : "next"
+                  }
+                  // Only the line on screen belongs in the live region; the
+                  // others would all be read out at once.
+                  aria-hidden={index === active ? undefined : true}
+                >
+                  {message}
+                </span>
+              ))}
+            </p>
+
+            {/* The bar already carries this figure for anything listening,
+                so out loud it would be said twice. */}
+            <span className="loading__percent" aria-hidden="true">
+              {percent}%
+            </span>
+          </div>
         </div>
       </div>
 
