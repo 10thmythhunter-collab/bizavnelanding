@@ -296,6 +296,10 @@
 
 .aira__label {
   position: absolute;
+  /* Where on the orbit it hangs — see the table in Aira.jsx, which hands
+     these over as properties so this stays overridable further down. */
+  left: var(--aira-left);
+  top: var(--aira-top);
   display: flex;
   align-items: center;
   height: clamp(2.25rem, 3.06vw, 2.75rem);
@@ -469,10 +473,23 @@
    above 900px, and it shrinks rather than overflows below it. */
 
 @media (max-width: 560px) {
-  /* The labels are pinned to a box that is now narrow enough for them to
-     collide with each other and with the mark. */
-  .aira__label {
-    display: none;
+  /* The labels used to be dropped here. They are not in the way of each other
+     — the orbit spreads them far enough apart down the burst that the gaps
+     between them stay clear at this width — and they are meant to be over the
+     mark, which is what an orbit is. The one real problem was that they run
+     off the right of the screen, and it is worth being exact about why: each
+     is placed by a left offset taken from the design, and a left offset has no
+     idea how wide the text sitting in it turns out to be. On a wide frame
+     there is enough room to the right that it never shows. Here there is not,
+     and the longest of them hangs over the edge.
+
+     So the two that orbit to the right of the burst are hung from the right
+     instead, where the edge they must not cross is the edge they are measured
+     from and the length of the text stops mattering. The two on the left keep
+     their own offsets, which have the same amount of room they always had. */
+  .aira__label[data-side="right"] {
+    left: auto;
+    right: 0;
   }
 }
 
