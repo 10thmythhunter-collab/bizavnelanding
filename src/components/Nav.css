@@ -269,6 +269,29 @@
    link having changed state, one that sweeps reads as the pointer running
    along it. scaleX off a left origin, so it is a transform the compositor
    can carry rather than a width the layout has to re-resolve each frame. */
+/* The rule between the products and what follows them. Drawn in the middle
+   of the row's own gap rather than as a border on either neighbour, so
+   neither item's box changes size and the row's spacing stays the design's.
+   Its ink is the bar's, so it turns with the bar. */
+.nav__divided {
+  position: relative;
+}
+
+.nav__divided::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--nav-link-gap) / -2);
+  top: 50%;
+  width: 1px;
+  /* A cap-height's worth — a rule as tall as the whole row would read as a
+     column divider rather than a pause between two words. */
+  height: 1.15em;
+  transform: translateY(-50%);
+  background-color: var(--nav-fg);
+  opacity: 0.3;
+  transition: background-color 300ms ease;
+}
+
 .nav__link-icon {
   display: block;
   width: var(--nav-icon-size, 1.1875em);
@@ -335,21 +358,38 @@
 }
 
 .nav__annotation-bracket {
+  position: relative;
   width: 100%;
   height: 2em;
-  /* The stubs sit half a stroke inside the viewBox edges, and the box is
-     scaled horizontally — without this they clip. */
-  overflow: visible;
-  max-width: none;
 }
 
-.nav__annotation-bracket path {
-  fill: none;
-  stroke: var(--nav-rule);
-  stroke-width: 1;
-  /* The box is stretched to the sub-list's width, which would otherwise
-     thin the two vertical stubs to a fraction of the horizontal rule. */
-  vector-effect: non-scaling-stroke;
+/* One hairline each, all three the same real pixel whatever the bracket ends
+   up measuring — which is the point of building it this way. */
+.nav__annotation-stub,
+.nav__annotation-rule {
+  position: absolute;
+  background-color: var(--nav-rule);
+}
+
+.nav__annotation-stub {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.nav__annotation-stub--left {
+  left: 0;
+}
+
+.nav__annotation-stub--right {
+  right: 0;
+}
+
+.nav__annotation-rule {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
 }
 
 .nav__annotation-arrow {
@@ -393,12 +433,34 @@
    forwards-only on purpose: a "both" fill would apply its start state during
    the delay and wipe out the incoming pass before it ever ran. */
 
-@keyframes nav-annotation-draw {
+/* Each piece is uncovered from the end the last one finished at, so the three
+   read as one line travelling: down the left stub, across, up the right one.
+   Played in reverse they retreat the way they came — which is why the
+   retract below is these same three, reversed and in the opposite order. */
+@keyframes nav-annotation-down {
   from {
-    stroke-dashoffset: 100;
+    clip-path: inset(0 0 100% 0);
   }
   to {
-    stroke-dashoffset: 0;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes nav-annotation-across {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes nav-annotation-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
 
@@ -424,16 +486,30 @@
   }
 }
 
-.nav__annotation-bracket path {
-  /* pathLength normalises the path to 100 units, so the dash covers it
-     whatever width the sub-list ends up at. */
-  stroke-dasharray: 100;
+/* The 800ms the whole bracket used to take, split between the three by how
+   much of it each one is: the stubs are 32 of the old path's 278 units, the
+   rule the 214 between them. */
+.nav__annotation-stub--left {
   animation:
-    nav-annotation-draw 800ms cubic-bezier(0.65, 0, 0.35, 1)
-      calc(var(--annotation-start, 0ms) + 400ms) both,
-    /* Reversed, the dash retreats the way it came: down the right stub,
-       back across, up the left one. */
-    nav-annotation-draw 800ms cubic-bezier(0.65, 0, 0.35, 1)
+    nav-annotation-down 92ms linear calc(var(--annotation-start, 0ms) + 400ms)
+      both,
+    /* Last out, as it was first in. */ nav-annotation-down 92ms linear
+      calc(var(--annotation-out) + 1748ms) reverse forwards;
+}
+
+.nav__annotation-rule {
+  animation:
+    nav-annotation-across 616ms cubic-bezier(0.65, 0, 0.35, 1)
+      calc(var(--annotation-start, 0ms) + 492ms) both,
+    nav-annotation-across 616ms cubic-bezier(0.65, 0, 0.35, 1)
+      calc(var(--annotation-out) + 1132ms) reverse forwards;
+}
+
+.nav__annotation-stub--right {
+  animation:
+    nav-annotation-up 92ms linear calc(var(--annotation-start, 0ms) + 1108ms)
+      both,
+    /* First out, as it was last in. */ nav-annotation-up 92ms linear
       calc(var(--annotation-out) + 1040ms) reverse forwards;
 }
 
@@ -739,6 +815,23 @@
   .nav__link-label::after {
     display: none;
   }
+
+  /* Stacked, an upright rule in the gap would stand beside the row rather
+     than between the two groups. The same rule lies across instead, inset to
+     where the menu's own rows begin — kept as the pseudo-element rather than
+     swapped for a border so it carries the same ink and the same weight. */
+  .nav__divided {
+    margin-top: 0.5rem;
+  }
+
+  .nav__divided::before {
+    left: 0.875em;
+    right: 0.875em;
+    top: -0.25rem;
+    width: auto;
+    height: 1px;
+    transform: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -790,13 +883,15 @@
   }
 
   /* The annotation still shows, it just arrives whole. */
-  .nav__annotation-bracket path,
+  .nav__annotation-stub,
+  .nav__annotation-rule,
   .nav__annotation-arrow,
   .nav__annotation-label {
     animation: none;
   }
 
-  .nav__annotation-bracket path {
-    stroke-dashoffset: 0;
+  .nav__annotation-stub,
+  .nav__annotation-rule {
+    clip-path: none;
   }
 }

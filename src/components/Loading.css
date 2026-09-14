@@ -1,22 +1,48 @@
-/* One screen, one clock. The composition is the design's 1440x705 frame, and
-   it holds together only as a whole — so every measure in it, across and down
-   alike, is a share of the viewport width, and the block is centred on the
-   vertical rather than pinned to a share of a height that scales on its own.
-   The loader covers an empty page, so there is no scrollbar to put vw and the
-   container's own width out of step. */
+/* One screen, one clock. The composition is the design's 1440x705 frame
+   ("Loading stage final — layout v2"), and it holds together only as a whole —
+   so every measure in it, across and down alike, is a share of the viewport
+   width, and the block is centred on the vertical rather than pinned to a
+   share of a height that scales on its own. The loader covers an empty page,
+   so there is no scrollbar to put vw and the container's own width out of
+   step. */
 
 .loading {
   position: fixed;
   inset: 0;
   z-index: 100;
   background-color: #ffffff;
-  /* The two aircraft are placed to run off the edges of the frame, and the
-     logo is scaled a hundred-odd times over on the way out; the screen crops
-     both, it does not grow to fit them. */
+  /* What the ground turns once the drawing is gone: the sky of the design's
+     second screen, which is a photograph of a jet above cloud — this is its
+     own blue, averaged off the band of sky across the top of that frame. One
+     token, because the ground, the keyframe that takes it there and the pane
+     that lands the dive must not be able to drift apart. */
+  --sky: #0e699d;
+  /* And what it all washes to as the camera moves in on the letter: the
+     brand's indigo, the colour the frame is standing in when the site takes
+     it. */
+  --brand: #2b2b8b;
+  /* How far the camera goes into the hole in the "a" — see @keyframes
+     loading-zoom. One number for every window: the lockup is measured in vw,
+     so the hole and the frame grow together and this clears the corner of any
+     of them. */
+  --dive-scale: 250;
+  /* How far past the left edge of the frame the box the drawing and the
+     photograph are cropped into is allowed to reach. Nothing here, so the
+     composition is shown as drawn; see the phone breakpoint for why it is not
+     nothing there. Held as a positive length and negated where it is used:
+     folded in already negative it would produce "100% - -71vh" in the width
+     below, which is not valid arithmetic and silently drops the whole
+     declaration. */
+  --art-overhang: 0px;
+  /* The sketch is bled past every edge of the frame, and the logo is scaled a
+     couple of hundred times over on the way out; the screen crops both, it
+     does not grow to fit them. */
   overflow: hidden;
+  /* HANDOVER_MS in Loading.jsx. The two have to agree: the component unmounts
+     on its own clock and this is what it is waiting for. */
   transition:
-    opacity 400ms ease,
-    visibility 0s linear 400ms;
+    opacity 600ms ease,
+    visibility 0s linear 600ms;
 }
 
 .loading[data-leaving] {
@@ -27,48 +53,83 @@
   pointer-events: none;
 }
 
-/* --- the drawings ---
-   Each is swept over one line at a time while the bar fills. Every path
-   carries the place it holds along that sweep, written into the asset itself,
-   and turns up that many steps after the front sets off. The two run together
-   and outward from the copy, each drawn away from the middle towards the edge
-   it stands nearest. */
+/* --- the drawing ---
+   The design's background, bled to all four edges the way the design bleeds
+   it: one pen sketch of a jet over cloud, swept on a line at a time while the
+   bar fills. Every path carries the place it holds along that sweep, written
+   into the asset itself, and turns up that many steps after the front sets
+   off. How far back it sits is the group opacity Figma holds it at, carried
+   through in the asset — nothing here dims it further. */
 
-.loading__blueprint {
+/* Both pictures are cropped into this box rather than into the frame, and on
+   a phone the box reaches out past the frame's left edge — see the breakpoint.
+   Sliding the picture itself does not work and is worth saying why: an inline
+   svg held at slice, and an <img> held at cover, are each exactly the size of
+   their own element with the overspill already clipped inside it, so there is
+   nothing there to slide into. Moving the element moves the hole it is seen
+   through with it and takes the picture off the screen. Moving the box is
+   what moves the crop. */
+.loading__art {
   position: absolute;
-  top: 50%;
-  /* Only bites on the <img> the fetch falls back to; the inline svg is sized
-     by the rule below. */
-  height: auto;
-  transform: translateY(-50%);
-  /* How far back the drawings sit. They come out of Figma at 0.4 and this
-     takes them a little further; it is on the drawing rather than baked into
-     the asset so it stays a number to turn, and it multiplies each line's own
-     fade rather than fighting it. */
-  opacity: 0.8;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * var(--art-overhang));
+  right: 0;
+  width: auto;
 }
 
-/* Straight off the design frame, in a 1440x705 screen: the aircraft stand
-   clear of both edges, 470 across at x=10 and at x=960. */
-.loading__blueprint--left {
-  left: 0.694vw;
-  width: 32.639vw;
-}
-
-.loading__blueprint--right {
-  left: 66.667vw;
-  width: 32.639vw;
-}
-
-.loading__blueprint svg {
+/* The sketch is drawn on a 1431x705 page and the window is whatever it is.
+   The asset carries preserveAspectRatio="slice", so it fills the frame and
+   lets the frame crop it — the same way the design runs it off all four
+   edges — rather than letterboxing a drawing that has no edges to show. */
+.loading__art svg,
+.loading__art img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
 }
 
-.loading__blueprint .ink {
+/* --- the photograph ---
+   The design's second screen. It is the image the sketch was drawn from —
+   same aircraft, same pose — so bringing it up under a drawing that is on its
+   way out reads as the drawing becoming the thing, not as one picture wiping
+   another.
+
+   In the document from the first frame and held at nothing, so the browser
+   has the whole load and the whole hold to fetch and decode it: it gets one
+   chance to arrive, on the same 600ms as the logo's walk, and a decode at
+   that moment would be a visible hitch. */
+/* The same box as the drawing, off the same token, so the two are cropped
+   alike and stay registered through the dissolve. */
+.loading__photo {
+  position: absolute;
+  top: 0;
+  left: calc(-1 * var(--art-overhang));
+  /* Measured out rather than pinned to both edges. This is an <img>, and an
+     absolutely positioned replaced element does not stretch between a left and
+     a right the way the drawing's <div> does — it keeps its own size and sits
+     at the left, which put the whole photograph off the side of the screen.
+     So it is given the width the box works out to instead. */
+  width: calc(100% + var(--art-overhang));
+  height: 100%;
+  /* The stylesheet caps every image and svg at the width of its container, so
+     that width would otherwise be handed straight back — which is what put the
+     photograph in a 390px box hanging off the left of a phone screen while the
+     drawing beside it, being a <div>, took the full box. */
+  max-width: none;
+  /* Drawn on a 16:9 frame and shown on whatever the window is; cover, so the
+     sky reaches every edge and the frame takes the difference out of the
+     cloud at the bottom, the way the design's own crop does. */
+  object-fit: cover;
+  opacity: 0;
+}
+
+.loading__art .ink {
   animation: loading-line var(--line-ms) ease-out both;
-  animation-delay: calc(var(--draw-at, 0ms) + var(--i, 0) * var(--line-step, 0ms));
+  animation-delay: calc(
+    var(--draw-at, 0ms) + var(--i, 0) * var(--line-step, 0ms)
+  );
 }
 
 @keyframes loading-line {
@@ -81,25 +142,28 @@
 }
 
 /* --- the copy ---
-   550 wide at x=445, a centred column of logo, headline and bar on even 32px
-   gaps. It is there from the first frame: the bar has to report from the
-   first frame, and the column reads as one block with it. */
+   348 wide at x=120, ranged left: logo, headline, then the bar 56 below it.
+   It is there from the first frame — the bar has to report from the first
+   frame, and the column reads as one block with it.
+
+   Placed by the top of the logo rather than the top of the design's own box,
+   which opens with a 40 spacer: 217 down the 705 frame is 135.5 above its
+   middle, and the middle is the one line that holds when the frame doesn't. */
 
 .loading__copy {
   position: absolute;
-  left: 30.903vw;
-  top: calc(50% - 12.213vw);
-  width: 38.194vw;
+  left: 8.333vw;
+  top: calc(50% - 9.41vw);
+  width: 24.167vw;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2.222vw;
+  align-items: flex-start;
 }
 
 .loading__lockup {
   display: block;
-  /* 170 of 1440 across. */
-  width: 11.806vw;
+  /* 215 of 1440 across. */
+  width: 14.931vw;
   height: auto;
   max-width: none;
 }
@@ -107,12 +171,12 @@
 .loading__headline {
   margin: 0;
   font-weight: 400;
-  /* 56px at the design width, on the family's own leading. */
-  font-size: clamp(1.75rem, 3.889vw, 3.5rem);
-  line-height: 1.3;
-  letter-spacing: -0.025em;
+  /* 60px at the design width, on its own 64px leading. */
+  font-size: clamp(1.75rem, 4.167vw, 3.75rem);
+  line-height: 1.0667;
+  letter-spacing: -0.015em;
   color: #000000;
-  text-align: center;
+  text-align: left;
 }
 
 .loading__line {
@@ -120,60 +184,52 @@
 }
 
 /* --- the bar ---
-   370 wide, 6px above its status line. */
+   348 wide, 14 above the line that reads it out. */
 
 .loading__group {
+  /* The design's own gap 56, off the headline's last line. */
+  margin-top: 3.889vw;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  width: min(25.694vw, calc(100% - 3rem));
-}
-
-.loading__bar {
-  position: relative;
-  /* Tall enough for the plane, which overhangs the track on both sides. */
-  height: 24px;
-  display: flex;
-  align-items: center;
+  gap: 14px;
+  width: min(24.167vw, 100%);
 }
 
 .loading__track {
   width: 100%;
   height: 2px;
-  border-radius: 2px;
-  background-color: rgba(0, 0, 0, 0.12);
+  border-radius: 1px;
+  background-color: rgba(15, 15, 15, 0.12);
   overflow: hidden;
 }
 
 .loading__fill {
   width: calc(var(--progress, 0) * 100%);
   height: 100%;
-  border-radius: 2px;
-  background-color: rgba(65, 65, 65, 0.45);
+  border-radius: 1px;
+  background-color: #171717;
 }
 
-.loading__plane {
-  position: absolute;
-  top: 0;
-  /* Rides the tip of the fill. The floor keeps it from hanging off the left
-     end in the first frames, before there is any fill to ride. */
-  left: max(12px, calc(var(--progress, 0) * 100%));
-  width: 24px;
-  height: 24px;
-  transform: translateX(-50%);
+/* The label on the left, the figure hard against the right end of the track,
+   the way the design sets them. */
+.loading__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.875rem;
+  line-height: 20px;
 }
 
 .loading__status {
   /* All the lines share one cell: the block is one line tall and as wide as
      the longest message, so nothing shifts as they cycle. */
   display: grid;
-  justify-items: center;
+  justify-items: start;
   margin: 0;
   font-weight: 400;
-  font-size: 0.875rem;
-  line-height: 20px;
-  color: rgba(0, 0, 0, 0.55);
-  text-align: center;
+  color: #6b7078;
+  text-align: left;
 }
 
 .loading__message {
@@ -200,14 +256,35 @@
   transform: translateY(8px);
 }
 
-/* Below the design's proportions the aircraft and the copy stop fitting side
-   by side. */
+.loading__percent {
+  flex-shrink: 0;
+  font-weight: 500;
+  color: #171717;
+  /* The figure is read right to left as it climbs, and a tabular cell keeps
+     the three widths it passes through from shuffling the label beside it. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Below the design's proportions the copy stops fitting in a quarter of the
+   frame. The drawing stays: it is bled and cropped either way, and it is the
+   paper the screen is printed on. */
 @media (max-width: 900px) {
-  /* The aircraft need the full frame to stand either side of the copy, and
-     there isn't one; the copy has the screen to itself. */
-  .loading__blueprint--left,
-  .loading__blueprint--right {
-    display: none;
+  /* Both pictures are twice as wide as they are tall and a phone is the other
+     way about, so the frame throws away most of their width and keeps the
+     middle — which is wing and engine, with the cabin off the right-hand edge
+     of the crop entirely.
+
+     So the box they are cropped into is let out past the left of the frame.
+     The picture then centres itself in a box wider than the screen, and the
+     screen is looking at the right-hand end of it: the cabin comes in, and
+     nothing can uncover, because the box still reaches both edges of the
+     frame whatever this is set to.
+
+     In vh because the crop is driven by height — the picture is scaled to
+     cover the frame's height and its width follows — so the same number holds
+     as phones get taller or shorter. */
+  .loading {
+    --art-overhang: 71vh;
   }
 
   .loading__copy {
@@ -216,24 +293,26 @@
     top: 50%;
     width: auto;
     transform: translateY(-50%);
-    gap: 1.5rem;
   }
 
   .loading__lockup {
-    width: min(170px, 45%);
+    width: min(215px, 55%);
   }
 
   .loading__group {
-    width: min(370px, 100%);
+    margin-top: 2rem;
+    width: 100%;
   }
 }
 
 /* --- the exit ---
    The drawings retreat the way they came while everything but the logo
    softens out of focus — together, not one after the other. Then the logo
-   walks to the middle of the screen, holds a beat, and the frame dives into
-   the "a" of .ai. --dx and --dy are measured in JS, because where the logo
-   starts depends on where the copy wrapped.
+   walks to the middle of the screen and grows to the size the design's second
+   screen draws it at, the photograph that screen is built on comes up under
+   it, and the frame dives into the eye of the "a" in "bizav". --dx and --dy
+   are measured in JS, because where the logo starts depends on where the copy
+   wrapped.
 
    Nothing here may reuse a keyframe name the element is already running: same
    name means the browser updates that animation instead of starting one, and
@@ -253,7 +332,7 @@
    down back to the first, so the pen retreats the way it came. Filled both
    ways: a line has to stand there until its turn comes, and the entrance it
    was holding is gone the moment this replaces it. */
-.loading[data-stage="exit"] .loading__blueprint .ink {
+.loading[data-stage="exit"] .loading__art .ink {
   animation: loading-vanish var(--line-ms) ease-in
     calc((var(--steps, 1) - var(--i, 0)) * var(--undraw-step, 0ms)) both;
 }
@@ -279,12 +358,13 @@
 .loading[data-stage="exit"] .loading__lockup {
   position: relative;
   z-index: 1;
-  /* The left side of the bowl of the first "a", the one in "bizav": 107.7 of
-     172 across and 27.05 of 54 down in the asset's own coordinates. The ink
-     there is 4.5 units thick and runs 12 deep, which is what lets the dive
-     end on solid black. Scaling about that point keeps it nailed to the
-     middle of the frame while the ink swallows everything. */
-  transform-origin: 62.6% 50.1%;
+  /* The hole inside the first "a", the one in "bizav" — the counter, not the
+     ink around it: a circle of radius 5.08 centred on 114.86, 27.07 of the
+     asset's own 172x54. Scaling about that point pins it to the middle of the
+     frame, so the ring of ink around it opens outwards past all four edges
+     and what is left filling the screen is whatever the hole was showing —
+     which by then is the brand's indigo. */
+  transform-origin: 66.78% 50.13%;
   animation:
     /* Waits out the un-drawing: the screen is empty but for the logo before
        it moves. */
@@ -293,46 +373,131 @@
     /* Forwards-only: a "both" fill would apply its start state during the
        delay and cancel the walk before it ran. */
     loading-zoom var(--zoom-ms) cubic-bezier(0.55, 0, 1, 0.45) var(--zoom-at)
-      forwards;
+      forwards,
+    /* Black to white, on the same clock as the ground it stands on. An
+       inversion rather than a second asset: the mark is one flat ink on
+       nothing, so inverting it turns that ink white and leaves the paper it
+       is cut out of alone. */
+    loading-flip var(--colour-ms) ease-in-out var(--colour-at) both;
 }
+
+@keyframes loading-flip {
+  from {
+    filter: invert(0);
+  }
+  to {
+    filter: invert(1);
+  }
+}
+
+/* The walk, and the growth that comes with it: the design draws the mark 215
+   across on the first screen and 269 on the second, so arriving in the middle
+   and arriving at that size are one move.
+
+   The second translate in each of these is the correction the origin costs.
+   Everything here scales about the hole in the "a" rather than the middle of
+   the box, which drags the box off centre by (0.5 - origin) x (1 - scale) of
+   its own width — so that is what is given back, and at the end of the dive
+   the whole of it is given back instead, which puts the hole itself dead
+   centre, where it has to be for the frame to empty evenly. */
 
 @keyframes loading-center {
   from {
-    transform: translate(0, 0);
+    transform: translate(0, 0) scale(1);
   }
   to {
-    transform: translate(var(--dx, 0), var(--dy, 0));
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.215%, 0)
+      scale(1.2512);
   }
 }
 
 @keyframes loading-zoom {
   from {
-    transform: translate(var(--dx, 0), var(--dy, 0)) scale(1);
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.215%, 0)
+      scale(1.2512);
   }
   to {
-    /* The second translate is a share of the logo's own width, which pulls
-       the focal point from where it sits in the wordmark to dead centre. */
-    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-12.6%, 0)
-      scale(140);
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-16.78%, 0)
+      /* How far through. The hole is some 6px across at rest, so this opens
+         it to a couple of thousand of radius — well past the corner of any
+         frame it will be shown in, which is what puts the whole logo out of
+         shot rather than leaving a ring of it sitting somewhere in view. */
+      scale(var(--dive-scale));
   }
 }
 
-/* Ink can only get so far on its own — the last of the black comes from here,
-   under cover of the zoom. */
-.loading__ink {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background-color: #000000;
-  animation: loading-black var(--black-ms) ease-in var(--black-at) both;
+/* The photograph comes up as the logo sets off, on one clock with the walk,
+   the growth and the mark turning white — the design's second screen arriving
+   whole rather than assembling itself in parts.
+
+   Then the dive carries it: the camera goes into the letter and the sky is
+   pushed in under it, so what opens past the ring is a frame already moving,
+   and the site is handed that rather than a flat colour. Forwards-only, for
+   the same reason the zoom is — a filled start state would cancel the fade
+   that is still running when the delay begins. */
+.loading[data-stage="exit"] .loading__photo {
+  animation:
+    loading-sky var(--colour-ms) ease-in-out var(--colour-at) both,
+    loading-push var(--zoom-ms) cubic-bezier(0.33, 0, 0.15, 1) var(--zoom-at)
+      forwards;
 }
 
-@keyframes loading-black {
+@keyframes loading-sky {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes loading-push {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.28);
+  }
+}
+
+/* The wash. It comes up over the photograph on the move's own clock, so the
+   sky is gone by the time the camera settles and what is left standing is the
+   mark on the brand's colour — which is also a colour the site can be handed
+   from, where a photograph of a noon sky is not. Above the photograph by
+   document order; under the mark, which lifts itself on z-index. */
+.loading__wash {
+  position: absolute;
+  inset: 0;
+  background-color: var(--brand);
+  opacity: 0;
+}
+
+.loading[data-stage="exit"] .loading__wash {
+  animation: loading-wash var(--zoom-ms) ease-in-out var(--zoom-at) both;
+}
+
+@keyframes loading-wash {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The flat ground turns with it. Nothing of it shows while the photograph is
+   there — this is what the screen is wearing if the image never arrives, and
+   it is the colour it would have been anyway. */
+.loading[data-stage="exit"] {
+  animation: loading-colour var(--colour-ms) ease-in-out var(--colour-at) both;
+}
+
+@keyframes loading-colour {
+  from {
+    background-color: #ffffff;
+  }
+  to {
+    background-color: var(--sky);
   }
 }
 
@@ -343,17 +508,17 @@
     transform: none;
   }
 
-  /* One fade for each drawing rather than several hundred. */
-  .loading__blueprint .ink,
-  .loading[data-stage="exit"] .loading__blueprint .ink {
+  /* One fade for the drawing rather than a thousand. */
+  .loading__art .ink,
+  .loading[data-stage="exit"] .loading__art .ink {
     animation: none;
   }
 
-  .loading__blueprint {
+  .loading__art {
     animation: loading-fade var(--load-ms) ease-out both;
   }
 
-  .loading[data-stage="exit"] .loading__blueprint {
+  .loading[data-stage="exit"] .loading__art {
     animation: loading-vanish var(--undraw-ms) ease-in both;
   }
 
@@ -363,9 +528,20 @@
     animation-name: loading-vanish;
   }
 
-  /* No dive: the screen simply goes to black under the standing logo. */
+  /* No dive: the second screen is simply arrived at and held. The turn from
+     black to white stays — this rule replaces the whole shorthand, and the
+     photograph comes up under the mark either way, so dropping it would leave
+     a black mark on a blue sky. */
   .loading[data-stage="exit"] .loading__lockup {
-    animation: loading-center var(--lift-ms) ease-out var(--lift-at) both;
+    animation:
+      loading-center var(--lift-ms) ease-out var(--lift-at) both,
+      loading-flip var(--colour-ms) ease-in-out var(--colour-at) both;
+  }
+
+  /* The photograph still arrives — it is the design's own screen, not an
+     effect. Only the camera move on it goes. */
+  .loading[data-stage="exit"] .loading__photo {
+    animation: loading-sky var(--colour-ms) ease-in-out var(--colour-at) both;
   }
 
   @keyframes loading-fade {

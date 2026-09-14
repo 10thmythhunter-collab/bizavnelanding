@@ -24,7 +24,7 @@ import Testimonials from "./components/Testimonials.jsx";
 // The intro screen is off: the site paints straight away. Flip this back to
 // true to restore it — nothing else has to change, the handover below just
 // starts gated again instead of pre-satisfied.
-const SHOW_LOADER = false;
+const SHOW_LOADER = true;
 
 // Matches .app__rest / .app__owners's own transition-duration in App.css.
 const FADE_MS = 400;

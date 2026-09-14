@@ -1,9 +1,8 @@
 import { memo, useEffect, useRef, useState } from "react";
-import leftUrl from "../assets/blueprint-left.svg";
-import rightUrl from "../assets/blueprint-right.svg";
+import sketchUrl from "../assets/loading-sketch.svg";
+import skyUrl from "../assets/loading-sky.jpg";
 import lockup from "../assets/bizavLockup.svg";
 import heroPoster from "../assets/hero-skyline.jpg";
-import plane from "../assets/plane-progress.svg";
 import "./Loading.css";
 
 // The first line is the design's; the rest carry the same voice. The bar is
@@ -17,14 +16,14 @@ const messages = [
 
 // The load: the bar does not creep, it reports. It moves to a third, waits,
 // moves to two thirds, waits, then finishes — one step per message below it.
-// The three drawings are laid down across exactly that span, so the pen and
-// the bar finish together.
+// The drawing is laid down across exactly that span, so the pen and the bar
+// finish together.
 const STEPS = 3;
 const STEP_MS = 400;
-const STEP_HOLD_MS = 600;
+const STEP_HOLD_MS = 450;
 // It is full the moment the last of those moves lands, so the wait that would
-// have followed never happens — and counting it in would leave the drawings
-// six hundred milliseconds short of the bar they are timed against.
+// have followed never happens — and counting it in would leave the drawing
+// six hundred milliseconds short of the bar it is timed against.
 const LOAD_MS = (STEPS - 1) * (STEP_MS + STEP_HOLD_MS) + STEP_MS;
 
 // Ease each step in and out of its own move; the pauses carry the rhythm, but
@@ -33,49 +32,77 @@ function smooth(t) {
   return t * t * (3 - 2 * t);
 }
 
-// How long a single line of a drawing takes to land. The gap between one step
-// of a sweep and the next is whatever is left of the load divided between them.
+// How long a single line of the drawing takes to land. The gap between one
+// step of the sweep and the next is whatever is left of the load divided
+// between them.
 const LINE_MS = 400;
 
-// The drawings are inlined rather than dropped in an <img> so their several
-// hundred paths can be animated one at a time. Fetched rather than imported,
-// which would put 280KB of markup in the bundle ahead of the first paint —
-// and the screen cannot start until they are here, because they are the
-// screen.
+// The design's own background: the pen sketch bled to all four edges, built
+// out of Figma by scripts/build-loading-sketch.mjs. It is inlined rather than
+// dropped in an <img> so its thousand paths can be animated one at a time —
+// which is the whole point of it, and what a flat picture of the same drawing
+// could not do. Fetched rather than imported, which would put the markup in
+// the bundle ahead of the first paint; and the screen cannot start until it is
+// here, because it is the screen.
 //
-// Both sweep outward from the copy in the middle, together, over the bar's own
-// span — so the pen and the bar finish on the same beat.
-const blueprints = [
-  { name: "left", url: leftUrl, at: 0, drawMs: LOAD_MS },
-  { name: "right", url: rightUrl, at: 0, drawMs: LOAD_MS },
-];
+// One sweep, left to right across the page, over the bar's own span — so the
+// pen and the bar finish on the same beat.
+const artwork = [{ name: "sketch", url: sketchUrl, at: 0, drawMs: LOAD_MS }];
 
-// The screen stands finished once the bar fills — drawings whole, nothing
+// The screen stands finished once the bar fills — drawing whole, nothing
 // moving — before anything starts to leave.
-const FULL_HOLD_MS = 2000;
+const FULL_HOLD_MS = 700;
 
-// The exit, after that. The drawings retreat the way they came while
-// everything but the logo softens out of focus; only then does the logo walk
-// to the middle, stand for a beat, and the frame dive into the "a" of .ai
-// until nothing but ink is left.
-const UNDRAW_MS = 1600;
+// The exit, after that, and it is the design's second screen being arrived at
+// rather than a set of effects.
+//
+// The drawing retreats the way it came while everything but the logo softens
+// out of focus. Then, in one move: the logo walks to the middle and grows to
+// the size the second screen draws it at, the mark turns from black to white,
+// and the sketch gives way to the photograph it was drawn from — same
+// aircraft, same pose, so the drawing does not dissolve into a picture, it
+// becomes one. That standing frame IS the second screen, and it is held.
+//
+// Only then does the camera dive into the round hole inside the first "a" of
+// "bizav", the sky washing to the brand's indigo under it as it goes. It does
+// not stop on the letter: it goes through, far enough that the mark's own
+// ring has passed every edge of the frame and the whole logo is out of shot,
+// leaving nothing but the colour that was showing through the hole. The site
+// fades up over that.
+const UNDRAW_MS = 1200;
 const VANISH_MS = 600;
-const LIFT_AT = UNDRAW_MS;
+// Part way into the un-drawing rather than after it. Waiting for the last line
+// to leave puts an empty white screen between the two frames — the drawing is
+// gone and the photograph has not started — and what the sequence is meant to
+// show is one turning into the other. Setting off here has the sky rising
+// through a pen that is still retreating, which is the whole trick: the same
+// aircraft in the same pose, drawn and then real.
+const LIFT_AT = Math.round(UNDRAW_MS * 0.58);
 const LIFT_MS = 450;
-// Long enough to read as a stop rather than a bounce, and no longer.
-const CENTRE_HOLD_MS = 900;
-const ZOOM_AT = LIFT_AT + LIFT_MS + CENTRE_HOLD_MS;
-const ZOOM_MS = 600;
-// The dive can only carry the ink so far; the rest of the black comes in
-// under cover of its second half, landing with it.
-const BLACK_AT = ZOOM_AT + ZOOM_MS / 2;
-const BLACK_MS = ZOOM_MS / 2;
-const BLACK_HOLD_MS = 200;
-const EXIT_MS = BLACK_AT + BLACK_MS + BLACK_HOLD_MS;
+// The photograph, the ground under it and the mark standing on it all arrive
+// on the walk rather than after it: the logo setting off is the cue, so one
+// clock drives all three and there is no moment where a black mark is sitting
+// on a blue sky.
+const COLOUR_AT = LIFT_AT;
+const COLOUR_MS = 600;
+// The second screen is a frame of its own in the design, so it is given the
+// length of one before the camera moves again.
+const COLOUR_HOLD_MS = 900;
+const ZOOM_AT = COLOUR_AT + COLOUR_MS + COLOUR_HOLD_MS;
+// Long enough to read as a camera being flown rather than a jump cut. It
+// accelerates rather than settling, because it is going through something
+// rather than arriving at it.
+const ZOOM_MS = 900;
+// The frame the dive leaves behind — nothing but the brand's colour — wants
+// to be seen as a frame of its own before the site comes up through it.
+const ZOOM_HOLD_MS = 350;
+const EXIT_MS = ZOOM_AT + ZOOM_MS + ZOOM_HOLD_MS;
 
-// The site is already painted black behind the loader by then; this is only
-// the last of the cover coming off.
-const HANDOVER_MS = 400;
+// The site is already painted behind the loader by then; this is the cover
+// coming off, and it is a fade rather than a cut — long enough to read as the
+// site arriving over the letter. Matches .loading's own transition in the
+// stylesheet, which has to be given the same number by hand.
+const HANDOVER_MS = 600;
 
 // Read once, when the markup lands: every path carries its place in the
 // drawing's own sweep, so the last place is how many steps that sweep has —
@@ -90,18 +117,24 @@ function sweepSteps(markup) {
 // which replaces every path with a new element and restarts every line's
 // animation, sixty times a second. Nothing here depends on the progress, so
 // the cheapest fix is for it never to re-render at all.
-const Blueprint = memo(function Blueprint({ name, url, markup, steps, at, drawMs }) {
+const Drawing = memo(function Drawing({
+  name,
+  url,
+  markup,
+  steps,
+  at,
+  drawMs,
+}) {
   const style = {
     "--steps": steps,
-    // Spread whatever each window has left over those steps and that is the
-    // pace. Kept on the drawing rather than the screen so the three never have
+    // Spread whatever the window has left over those steps and that is the
+    // pace. Kept on the drawing rather than the screen so the two never have
     // to share a clock.
     "--draw-at": `${at}ms`,
     "--line-step": `${(drawMs - LINE_MS) / steps}ms`,
-    // They all leave together, so this one is the same for each of them.
     "--undraw-step": `${(UNDRAW_MS - LINE_MS) / steps}ms`,
   };
-  const className = `loading__blueprint loading__blueprint--${name}`;
+  const className = `loading__art loading__art--${name}`;
 
   return markup ? (
     <div
@@ -112,7 +145,7 @@ const Blueprint = memo(function Blueprint({ name, url, markup, steps, at, drawMs
       dangerouslySetInnerHTML={{ __html: markup }}
     />
   ) : (
-    // The fetch is allowed to fail; the screen still needs its drawings.
+    // The fetch is allowed to fail; the screen still needs its drawing.
     <img className={className} style={style} src={url} alt="" />
   );
 });
@@ -136,16 +169,18 @@ function Loading({ onDone, onExited }) {
   const [leaving, setLeaving] = useState(false);
   const lockupRef = useRef(null);
 
-  // Nothing can be shown until the drawings are here — they are most of what
-  // there is to show, and starting the bar without them would have the pen
-  // join a sweep already in progress. The hero's first frame is fetched
-  // alongside but does not hold the screen up: the sequence runs for seven
-  // seconds after this, which is all the head start it needs.
+  // Nothing can be shown until the drawing is here — it is most of what there
+  // is to show, and starting the bar without it would have the pen join a
+  // sweep already in progress. The photograph the drawing turns into is
+  // fetched alongside but does not hold the screen up, and neither does the
+  // hero's first frame: the sequence runs for some seven seconds after this,
+  // which is all the head start either needs.
   useEffect(() => {
     let live = true;
+    preload(skyUrl);
     preload(heroPoster);
     Promise.all(
-      blueprints.map(({ name, url }) =>
+      artwork.map(({ name, url }) =>
         fetch(url)
           .then((response) => response.text())
           .then((markup) => [name, markup]),
@@ -241,6 +276,7 @@ function Loading({ onDone, onExited }) {
     messages.length - 1,
     Math.floor(progress * messages.length),
   );
+  const percent = Math.round(progress * 100);
 
   return (
     <div
@@ -250,25 +286,25 @@ function Loading({ onDone, onExited }) {
       style={{
         "--line-ms": `${LINE_MS}ms`,
         // Only the reduced-motion fallback reads these two: it swaps the
-        // hundreds of per-line fades for one per drawing, and still has to
-        // fill the same two windows.
+        // thousand per-line fades for one, and still has to fill the same two
+        // windows.
         "--load-ms": `${LOAD_MS}ms`,
         "--undraw-ms": `${UNDRAW_MS}ms`,
         "--vanish-ms": `${VANISH_MS}ms`,
         "--lift-at": `${LIFT_AT}ms`,
         "--lift-ms": `${LIFT_MS}ms`,
+        "--colour-at": `${COLOUR_AT}ms`,
+        "--colour-ms": `${COLOUR_MS}ms`,
         "--zoom-at": `${ZOOM_AT}ms`,
         "--zoom-ms": `${ZOOM_MS}ms`,
-        "--black-at": `${BLACK_AT}ms`,
-        "--black-ms": `${BLACK_MS}ms`,
         "--dx": `${focus.dx}px`,
         "--dy": `${focus.dy}px`,
       }}
       aria-busy={!leaving}
     >
       {drawings &&
-        blueprints.map(({ name, url, at, drawMs }) => (
-          <Blueprint
+        artwork.map(({ name, url, at, drawMs }) => (
+          <Drawing
             key={name}
             name={name}
             url={url}
@@ -278,6 +314,20 @@ function Loading({ onDone, onExited }) {
             steps={drawings[name]?.steps ?? 1}
           />
         ))}
+
+      {/* The design's second screen. Mounted from the first frame and held at
+          nothing so it is decoded long before it is wanted — brought up on the
+          same clock as the logo's walk, it gets one shot at arriving without a
+          flicker. After the drawing in the DOM, so it covers it as it comes
+          rather than having to be lifted over it. */}
+      <img className="loading__photo" src={skyUrl} alt="" aria-hidden="true" />
+
+      {/* What the photograph washes to as the camera moves in. A pane of its
+          own rather than a second turn of the screen's own background: the
+          ground underneath is already doing one colour and cannot cleanly be
+          given a second, and this has to come up OVER the photograph, which
+          sits above that ground. */}
+      <div className="loading__wash" aria-hidden="true" />
 
       <div className="loading__copy">
         {/* The one thing that survives the exit, so it is a sibling of
@@ -292,53 +342,56 @@ function Loading({ onDone, onExited }) {
         <p className="loading__headline">
           {/* Broken by hand: where the line turns is the design's, not
               whatever the measure happens to allow. */}
-          <span className="loading__line">Platform for all</span>
-          <span className="loading__line">workflows</span>
+          <span className="loading__line">Platform for</span>
+          <span className="loading__line">all workflows</span>
         </p>
 
         {/* --progress lives here rather than on the screen: it changes every
             frame, and an ancestor's custom property invalidates the style of
-            everything under it — which would be all seven hundred lines of the
-            drawings, sixty times a second. */}
+            everything under it — which would be all thousand lines of the
+            drawing, sixty times a second. */}
         <div className="loading__group" style={{ "--progress": progress }}>
           <div
-            className="loading__bar"
+            className="loading__track"
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={Math.round(progress * 100)}
+            aria-valuenow={percent}
             aria-label="Loading bizav.ai"
           >
-            <div className="loading__track">
-              <div className="loading__fill" />
-            </div>
-            <img className="loading__plane" src={plane} alt="" />
+            <div className="loading__fill" />
           </div>
 
-          <p className="loading__status" role="status">
-            {messages.map((message, index) => (
-              <span
-                className="loading__message"
-                key={message}
-                data-slot={
-                  index === active
-                    ? "current"
-                    : index < active
-                      ? "past"
-                      : "next"
-                }
-                // Only the line on screen belongs in the live region; the
-                // others would all be read out at once.
-                aria-hidden={index === active ? undefined : true}
-              >
-                {message}
-              </span>
-            ))}
-          </p>
+          <div className="loading__row">
+            <p className="loading__status" role="status">
+              {messages.map((message, index) => (
+                <span
+                  className="loading__message"
+                  key={message}
+                  data-slot={
+                    index === active
+                      ? "current"
+                      : index < active
+                        ? "past"
+                        : "next"
+                  }
+                  // Only the line on screen belongs in the live region; the
+                  // others would all be read out at once.
+                  aria-hidden={index === active ? undefined : true}
+                >
+                  {message}
+                </span>
+              ))}
+            </p>
+
+            {/* The bar already carries this figure for anything listening,
+                so out loud it would be said twice. */}
+            <span className="loading__percent" aria-hidden="true">
+              {percent}%
+            </span>
+          </div>
         </div>
       </div>
-
-      {stage === "exit" && <div className="loading__ink" />}
     </div>
   );
 }
