@@ -337,6 +337,14 @@
        delay and cancel the walk before it ran. */
     loading-zoom var(--zoom-ms) cubic-bezier(0.33, 0, 0.15, 1) var(--zoom-at)
       forwards,
+    /* Last in the list, so while it runs it is the one that owns the
+       transform and takes over from the move above at the size that move
+       ended on. Forwards-only is not a preference here but the only thing
+       that works: a backwards fill would apply this keyframe's start state
+       through its whole delay, which would override the move from the first
+       frame and there would be no move at all. */
+    loading-pass var(--pass-ms) cubic-bezier(0.4, 0, 0.9, 0.6) var(--pass-at)
+      forwards,
     /* Black to white, on the same clock as the ground it stands on. An
        inversion rather than a second asset: the mark is one flat ink on
        nothing, so inverting it turns that ink white and leaves the paper it
@@ -370,6 +378,48 @@
   to {
     transform: translate(var(--dx, 0), var(--dy, 0)) translate(4.236%, 0)
       scale(1.2512);
+  }
+}
+
+/* Past the lens — and past it to one side, which is the whole reason this
+   works at all.
+
+   Growing it straight on does not: carry the "a" forward on the spot and its
+   own edges leave the frame while the round hole in the middle of it stays
+   dead centre and keeps growing, so the last thing seen is a circle. That is
+   the "o" this sequence has already been caught reading as once, and no
+   amount of fading hides it, because the hole is exactly what the fade is
+   least able to disguise — it is the part with nothing in it.
+
+   So it leaves the way anything leaves a camera it is not centred on: it
+   swells and slides off the corner at the same time. The frame empties from
+   the middle outwards instead of being swallowed from the middle outwards,
+   and what is left standing is the indigo.
+
+   The fade is set against the travel rather than in place of it. Too early
+   and the mark is gone before it has visibly moved, which reads as the logo
+   being switched off — the first cut of this lost it inside two hundred
+   milliseconds having grown a quarter, and it looked like a light going out.
+   Three fifths of the way is where there is enough travel behind it to be
+   read as travel.
+
+   Both keyframes carry the same four transform functions in the same order,
+   the first of them an identity here. Lists that do not match are interpolated
+   as matrices instead of piecewise, and at these scales that is a different
+   and much worse-looking move. */
+@keyframes loading-pass {
+  from {
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-16.86%, 0)
+      translate(0, 0) scale(var(--letter-scale));
+    opacity: 1;
+  }
+  60% {
+    opacity: 0;
+  }
+  to {
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-16.86%, 0)
+      translate(-52vw, 22vh) scale(calc(var(--letter-scale) * 2.4));
+    opacity: 0;
   }
 }
 

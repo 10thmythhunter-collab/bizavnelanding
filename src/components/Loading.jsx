@@ -63,11 +63,11 @@ const FULL_HOLD_MS = 700;
 // aircraft, same pose, so the drawing does not dissolve into a picture, it
 // becomes one. That standing frame IS the second screen, and it is held.
 //
-// Only then does the camera move in on the first "a" of "bizav" — on the
-// letter, and stopping while it is still a letter. The photograph goes with
-// the move: the sky washes to the brand's indigo under it, so what the camera
-// arrives at is the mark alone on the brand's own colour. The site fades up
-// over that.
+// Only then does the camera move in on the first "a" of "bizav", the sky
+// washing to the brand's indigo under it as it goes. The move eases off on
+// the letter — long enough to be read as a letter, not long enough to be a
+// stop — and then the mark carries on past the lens and is gone, leaving the
+// indigo it was standing on. The site fades up over that.
 const UNDRAW_MS = 1200;
 const VANISH_MS = 600;
 // Part way into the un-drawing rather than after it. Waiting for the last line
@@ -91,11 +91,19 @@ const ZOOM_AT = COLOUR_AT + COLOUR_MS + COLOUR_HOLD_MS;
 // Long enough to read as a camera being pushed rather than a jump cut; it
 // settles rather than accelerating, because it is arriving somewhere.
 const ZOOM_MS = 900;
-// It stops on the letter, on the indigo, and stands there. Without this the
-// move and the hand-off run together and the frame it was travelling to is
-// never actually seen.
-const ZOOM_HOLD_MS = 400;
-const EXIT_MS = ZOOM_AT + ZOOM_MS + ZOOM_HOLD_MS;
+// And then it keeps going, past the lens rather than parked in front of it.
+// Straight off the end of the move with no beat between: the move's own
+// easing already lets the letter settle, and a wait on top of that is what
+// makes it read as having stopped.
+const PASS_AT = ZOOM_AT + ZOOM_MS;
+// Long enough that the travel is what is seen. Shorter than this and the
+// mark is gone before it has visibly moved, which reads as the logo being
+// switched off rather than the camera going past it.
+const PASS_MS = 700;
+// The frame it leaves behind — nothing but the brand's colour — wants to be
+// seen as a frame before the site comes up through it.
+const PASS_HOLD_MS = 250;
+const EXIT_MS = PASS_AT + PASS_MS + PASS_HOLD_MS;
 
 // The site is already painted behind the loader by then; this is the cover
 // coming off, and it is a fade rather than a cut — long enough to read as the
@@ -296,6 +304,8 @@ function Loading({ onDone, onExited }) {
         "--colour-ms": `${COLOUR_MS}ms`,
         "--zoom-at": `${ZOOM_AT}ms`,
         "--zoom-ms": `${ZOOM_MS}ms`,
+        "--pass-at": `${PASS_AT}ms`,
+        "--pass-ms": `${PASS_MS}ms`,
         "--dx": `${focus.dx}px`,
         "--dy": `${focus.dy}px`,
       }}
