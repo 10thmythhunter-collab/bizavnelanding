@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import sketchUrl from "../assets/loading-sketch.svg";
+import skyUrl from "../assets/loading-sky.jpg";
 import lockup from "../assets/bizavLockup.svg";
 import heroPoster from "../assets/hero-skyline.jpg";
 import "./Loading.css";
@@ -15,14 +16,14 @@ const messages = [
 
 // The load: the bar does not creep, it reports. It moves to a third, waits,
 // moves to two thirds, waits, then finishes — one step per message below it.
-// The three drawings are laid down across exactly that span, so the pen and
-// the bar finish together.
+// The drawing is laid down across exactly that span, so the pen and the bar
+// finish together.
 const STEPS = 3;
 const STEP_MS = 400;
 const STEP_HOLD_MS = 450;
 // It is full the moment the last of those moves lands, so the wait that would
-// have followed never happens — and counting it in would leave the drawings
-// six hundred milliseconds short of the bar they are timed against.
+// have followed never happens — and counting it in would leave the drawing
+// six hundred milliseconds short of the bar it is timed against.
 const LOAD_MS = (STEPS - 1) * (STEP_MS + STEP_HOLD_MS) + STEP_MS;
 
 // Ease each step in and out of its own move; the pauses carry the rhythm, but
@@ -31,8 +32,9 @@ function smooth(t) {
   return t * t * (3 - 2 * t);
 }
 
-// How long a single line of a drawing takes to land. The gap between one step
-// of a sweep and the next is whatever is left of the load divided between them.
+// How long a single line of the drawing takes to land. The gap between one
+// step of the sweep and the next is whatever is left of the load divided
+// between them.
 const LINE_MS = 400;
 
 // The design's own background: the pen sketch bled to all four edges, built
@@ -47,41 +49,52 @@ const LINE_MS = 400;
 // pen and the bar finish on the same beat.
 const artwork = [{ name: "sketch", url: sketchUrl, at: 0, drawMs: LOAD_MS }];
 
-// The screen stands finished once the bar fills — drawings whole, nothing
+// The screen stands finished once the bar fills — drawing whole, nothing
 // moving — before anything starts to leave.
 const FULL_HOLD_MS = 700;
 
-// The exit, after that. The drawings retreat the way they came while
-// everything but the logo softens out of focus; the logo walks to the middle
-// and grows to the size the design's second screen draws it at; the white
-// ground fills with that screen's sky as the mark turns from black to white;
-// and then the frame dives into the eye of the "a" of "bizav" until the
-// letter has opened past every edge and only that sky is left.
+// The exit, after that, and it is the design's second screen being arrived at
+// rather than a set of effects.
+//
+// The drawing retreats the way it came while everything but the logo softens
+// out of focus. Then, in one move: the logo walks to the middle and grows to
+// the size the second screen draws it at, the mark turns from black to white,
+// and the sketch gives way to the photograph it was drawn from — same
+// aircraft, same pose, so the drawing does not dissolve into a picture, it
+// becomes one. That standing frame IS the second screen, and it is held.
+//
+// Only then does the camera dive into the eye of the "a" of "bizav", carrying
+// the sky forward with it, until the letter has opened past every edge and
+// the site is handed a frame that is already flying.
 const UNDRAW_MS = 1200;
 const VANISH_MS = 600;
-const LIFT_AT = UNDRAW_MS;
+// Part way into the un-drawing rather than after it. Waiting for the last line
+// to leave puts an empty white screen between the two frames — the drawing is
+// gone and the photograph has not started — and what the sequence is meant to
+// show is one turning into the other. Setting off here has the sky rising
+// through a pen that is still retreating, which is the whole trick: the same
+// aircraft in the same pose, drawn and then real.
+const LIFT_AT = Math.round(UNDRAW_MS * 0.58);
 const LIFT_MS = 450;
-// The colour arrives the moment the logo lands, and the mark turns with it —
-// one move, not two.
-const COLOUR_AT = LIFT_AT + LIFT_MS;
+// The photograph, the ground under it and the mark standing on it all arrive
+// on the walk rather than after it: the logo setting off is the cue, so one
+// clock drives all three and there is no moment where a black mark is sitting
+// on a blue sky.
+const COLOUR_AT = LIFT_AT;
 const COLOUR_MS = 600;
-// Long enough to be read as a frame of its own — it is a frame of its own in
-// the design, and white paper becoming a sky wants a beat before the camera
-// moves again.
-const COLOUR_HOLD_MS = 500;
+// The second screen is a frame of its own in the design, so it is given the
+// length of one before the camera moves again.
+const COLOUR_HOLD_MS = 900;
 const ZOOM_AT = COLOUR_AT + COLOUR_MS + COLOUR_HOLD_MS;
 const ZOOM_MS = 600;
-// The dive lands on the ground showing through the letter, so the frame is
-// already flat sky by the time it gets there; this lays the same colour over
-// the top under cover of the second half of the zoom, which takes the last of
-// the ring off the screen cleanly.
-const INK_AT = ZOOM_AT + ZOOM_MS / 2;
-const INK_MS = ZOOM_MS / 2;
-const INK_HOLD_MS = 200;
-const EXIT_MS = INK_AT + INK_MS + INK_HOLD_MS;
+// The ring is off every edge by the end of the dive and what is left standing
+// is the photograph, pushed in under it. Long enough to register as a frame
+// before the site takes it.
+const ZOOM_HOLD_MS = 200;
+const EXIT_MS = ZOOM_AT + ZOOM_MS + ZOOM_HOLD_MS;
 
-// The site is already painted behind the loader by then, and the loader is one
-// flat colour over it; this is only the cover coming off.
+// The site is already painted behind the loader by then; this is only the
+// cover coming off.
 const HANDOVER_MS = 400;
 
 // Read once, when the markup lands: every path carries its place in the
@@ -107,12 +120,11 @@ const Drawing = memo(function Drawing({
 }) {
   const style = {
     "--steps": steps,
-    // Spread whatever each window has left over those steps and that is the
-    // pace. Kept on the drawing rather than the screen so the three never have
+    // Spread whatever the window has left over those steps and that is the
+    // pace. Kept on the drawing rather than the screen so the two never have
     // to share a clock.
     "--draw-at": `${at}ms`,
     "--line-step": `${(drawMs - LINE_MS) / steps}ms`,
-    // They all leave together, so this one is the same for each of them.
     "--undraw-step": `${(UNDRAW_MS - LINE_MS) / steps}ms`,
   };
   const className = `loading__art loading__art--${name}`;
@@ -126,7 +138,7 @@ const Drawing = memo(function Drawing({
       dangerouslySetInnerHTML={{ __html: markup }}
     />
   ) : (
-    // The fetch is allowed to fail; the screen still needs its drawings.
+    // The fetch is allowed to fail; the screen still needs its drawing.
     <img className={className} style={style} src={url} alt="" />
   );
 });
@@ -150,13 +162,15 @@ function Loading({ onDone, onExited }) {
   const [leaving, setLeaving] = useState(false);
   const lockupRef = useRef(null);
 
-  // Nothing can be shown until the drawing is here — it is most of what
-  // there is to show, and starting the bar without it would have the pen
-  // join a sweep already in progress. The hero's first frame is fetched
-  // alongside but does not hold the screen up: the sequence runs for seven
-  // seconds after this, which is all the head start it needs.
+  // Nothing can be shown until the drawing is here — it is most of what there
+  // is to show, and starting the bar without it would have the pen join a
+  // sweep already in progress. The photograph the drawing turns into is
+  // fetched alongside but does not hold the screen up, and neither does the
+  // hero's first frame: the sequence runs for some seven seconds after this,
+  // which is all the head start either needs.
   useEffect(() => {
     let live = true;
+    preload(skyUrl);
     preload(heroPoster);
     Promise.all(
       artwork.map(({ name, url }) =>
@@ -265,8 +279,8 @@ function Loading({ onDone, onExited }) {
       style={{
         "--line-ms": `${LINE_MS}ms`,
         // Only the reduced-motion fallback reads these two: it swaps the
-        // hundreds of per-line fades for one per drawing, and still has to
-        // fill the same two windows.
+        // thousand per-line fades for one, and still has to fill the same two
+        // windows.
         "--load-ms": `${LOAD_MS}ms`,
         "--undraw-ms": `${UNDRAW_MS}ms`,
         "--vanish-ms": `${VANISH_MS}ms`,
@@ -276,8 +290,6 @@ function Loading({ onDone, onExited }) {
         "--colour-ms": `${COLOUR_MS}ms`,
         "--zoom-at": `${ZOOM_AT}ms`,
         "--zoom-ms": `${ZOOM_MS}ms`,
-        "--ink-at": `${INK_AT}ms`,
-        "--ink-ms": `${INK_MS}ms`,
         "--dx": `${focus.dx}px`,
         "--dy": `${focus.dy}px`,
       }}
@@ -295,6 +307,13 @@ function Loading({ onDone, onExited }) {
             steps={drawings[name]?.steps ?? 1}
           />
         ))}
+
+      {/* The design's second screen. Mounted from the first frame and held at
+          nothing so it is decoded long before it is wanted — brought up on the
+          same clock as the logo's walk, it gets one shot at arriving without a
+          flicker. After the drawing in the DOM, so it covers it as it comes
+          rather than having to be lifted over it. */}
+      <img className="loading__photo" src={skyUrl} alt="" aria-hidden="true" />
 
       <div className="loading__copy">
         {/* The one thing that survives the exit, so it is a sibling of
@@ -315,8 +334,8 @@ function Loading({ onDone, onExited }) {
 
         {/* --progress lives here rather than on the screen: it changes every
             frame, and an ancestor's custom property invalidates the style of
-            everything under it — which would be all seven hundred lines of the
-            drawings, sixty times a second. */}
+            everything under it — which would be all thousand lines of the
+            drawing, sixty times a second. */}
         <div className="loading__group" style={{ "--progress": progress }}>
           <div
             className="loading__track"
@@ -359,8 +378,6 @@ function Loading({ onDone, onExited }) {
           </div>
         </div>
       </div>
-
-      {stage === "exit" && <div className="loading__ink" />}
     </div>
   );
 }

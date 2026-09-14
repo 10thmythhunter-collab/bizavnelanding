@@ -61,6 +61,28 @@
   object-fit: cover;
 }
 
+/* --- the photograph ---
+   The design's second screen. It is the image the sketch was drawn from —
+   same aircraft, same pose — so bringing it up under a drawing that is on its
+   way out reads as the drawing becoming the thing, not as one picture wiping
+   another.
+
+   In the document from the first frame and held at nothing, so the browser
+   has the whole load and the whole hold to fetch and decode it: it gets one
+   chance to arrive, on the same 600ms as the logo's walk, and a decode at
+   that moment would be a visible hitch. */
+.loading__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Drawn on a 16:9 frame and shown on whatever the window is; cover, so the
+     sky reaches every edge and the frame takes the difference out of the
+     cloud at the bottom, the way the design's own crop does. */
+  object-fit: cover;
+  opacity: 0;
+}
+
 .loading__art .ink {
   animation: loading-line var(--line-ms) ease-out both;
   animation-delay: calc(
@@ -227,9 +249,10 @@
    The drawings retreat the way they came while everything but the logo
    softens out of focus — together, not one after the other. Then the logo
    walks to the middle of the screen and grows to the size the design's second
-   screen draws it at, the ground turns to that screen's sky under it, and the
-   frame dives into the eye of the "a" in "bizav". --dx and --dy are measured
-   in JS, because where the logo starts depends on where the copy wrapped.
+   screen draws it at, the photograph that screen is built on comes up under
+   it, and the frame dives into the eye of the "a" in "bizav". --dx and --dy
+   are measured in JS, because where the logo starts depends on where the copy
+   wrapped.
 
    Nothing here may reuse a keyframe name the element is already running: same
    name means the browser updates that animation instead of starting one, and
@@ -281,8 +304,8 @@
      middle of the frame, so the ring opens past all four edges and what is
      left standing is the sky the letter was cut out of. Aiming at the stroke
      instead would end the dive on solid white, and the site behind this is a
-     night skyline — the frame has to arrive in a colour it can hand over in,
-     not blow out to paper first. */
+     night skyline — the frame has to arrive on something it can hand over
+     from, not blow out to paper first. */
   transform-origin: 66.78% 50.13%;
   animation:
     /* Waits out the un-drawing: the screen is empty but for the logo before
@@ -344,9 +367,43 @@
   }
 }
 
-/* The ground turns. White paper for the drawing and the bar, then the sky of
-   the design's second screen once the drawing is gone and only the mark is
-   left standing on it. */
+/* The photograph comes up as the logo sets off, on one clock with the walk,
+   the growth and the mark turning white — the design's second screen arriving
+   whole rather than assembling itself in parts.
+
+   Then the dive carries it: the camera goes into the letter and the sky is
+   pushed in under it, so what opens past the ring is a frame already moving,
+   and the site is handed that rather than a flat colour. Forwards-only, for
+   the same reason the zoom is — a filled start state would cancel the fade
+   that is still running when the delay begins. */
+.loading[data-stage="exit"] .loading__photo {
+  animation:
+    loading-sky var(--colour-ms) ease-in-out var(--colour-at) both,
+    loading-push var(--zoom-ms) cubic-bezier(0.55, 0, 1, 0.45) var(--zoom-at)
+      forwards;
+}
+
+@keyframes loading-sky {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loading-push {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.28);
+  }
+}
+
+/* The flat ground turns with it. Nothing of it shows while the photograph is
+   there — this is what the screen is wearing if the image never arrives, and
+   it is the colour it would have been anyway. */
 .loading[data-stage="exit"] {
   animation: loading-colour var(--colour-ms) ease-in-out var(--colour-at) both;
 }
@@ -357,29 +414,6 @@
   }
   to {
     background-color: var(--sky);
-  }
-}
-
-/* The dive ends inside the letter, on the ground showing through it — so what
-   the frame is holding by then is already flat sky. This lays the same colour
-   over the top under cover of the zoom's second half, which takes the ring's
-   last edge and any seam at it off the screen a beat before the site is
-   handed the frame. It is the surface the site fades up through, which is why
-   it is the ground's colour and not the mark's. */
-.loading__ink {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background-color: var(--sky);
-  animation: loading-ink var(--ink-ms) ease-in var(--ink-at) both;
-}
-
-@keyframes loading-ink {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
@@ -410,14 +444,20 @@
     animation-name: loading-vanish;
   }
 
-  /* No dive: the ground simply fills under the standing logo. The turn from
+  /* No dive: the second screen is simply arrived at and held. The turn from
      black to white stays — this rule replaces the whole shorthand, and the
-     ground it is standing on goes to sky either way, so dropping it would
-     leave a black mark on a blue screen. */
+     photograph comes up under the mark either way, so dropping it would leave
+     a black mark on a blue sky. */
   .loading[data-stage="exit"] .loading__lockup {
     animation:
       loading-center var(--lift-ms) ease-out var(--lift-at) both,
       loading-flip var(--colour-ms) ease-in-out var(--colour-at) both;
+  }
+
+  /* The photograph still arrives — it is the design's own screen, not an
+     effect. Only the camera move on it goes. */
+  .loading[data-stage="exit"] .loading__photo {
+    animation: loading-sky var(--colour-ms) ease-in-out var(--colour-at) both;
   }
 
   @keyframes loading-fade {
