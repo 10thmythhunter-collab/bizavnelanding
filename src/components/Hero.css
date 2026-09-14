@@ -728,6 +728,31 @@
 /* --- responsive --- */
 
 @media (max-width: 700px) {
+  /* Hung from the top rather than stood on the floor.
+     
+     The stack is 478 tall and the screen is not, and bottom-anchored the
+     whole of that difference piles up in one place: above the switch, under
+     the bar. At 390x844 it was 295px of it, a third of the screen, empty. Nor
+     does it hold still — a taller phone puts more there and a shorter one
+     less, so the one gap nobody wants is the one gap that moves.
+
+     Measured from the top it is a number instead of a remainder: this padding
+     less the bar, the same on every phone, and the slack falls to the bottom
+     where there is a photograph to fall on. The stack keeps the floor it has
+     on a desk, where the row is wide enough that there is no slack to speak
+     of and none of this applies.
+
+     The height stays a full screen on purpose. Shortening it to fit the stack
+     reads as the tidier fix and is not: the section under this one arrives
+     when it crosses a line 32% up from the bottom of the window, and a hero
+     that ends above that line leaves it sitting just under the fold in its
+     un-arrived state — a band of blank page under the photograph until
+     something scrolls. */
+  .hero {
+    align-items: flex-start;
+    padding-top: 8rem;
+  }
+
   /* Centred, the way a phone hero is: with one column and no photograph to
      hang the copy off, a left-aligned block leaves a ragged column of white
      down the right of the screen and nothing to balance it. The switch above
@@ -792,9 +817,17 @@
      sentence and the chips that finish it are one thought; the numbers under
      them are a separate claim, and at this width they are a block of four
      rather than a single line, so they need a little air to stop reading as
-     a fourth line of the paragraph above. */
+     a fourth line of the paragraph above.
+
+     More air than that now the stack hangs from the top: 12px was measured
+     against a block sitting on the floor of the screen, where whatever was
+     left over showed above it. Hung from the top the leftover shows below
+     instead, and there is a lot of it — 278px of photograph under the stats
+     at 390x844 with the four of them still crowding the line above. This
+     spends some of it on the one gap in the stack that was carrying the
+     least. */
   .hero__stats {
-    margin-top: 0.75rem;
+    margin-top: 3.5rem;
   }
 
   .hero__stat-value {
