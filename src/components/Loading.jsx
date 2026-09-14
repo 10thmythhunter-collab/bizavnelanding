@@ -21,7 +21,7 @@ const messages = [
 // the bar finish together.
 const STEPS = 3;
 const STEP_MS = 400;
-const STEP_HOLD_MS = 600;
+const STEP_HOLD_MS = 450;
 // It is full the moment the last of those moves lands, so the wait that would
 // have followed never happens — and counting it in would leave the drawings
 // six hundred milliseconds short of the bar they are timed against.
@@ -52,29 +52,37 @@ const blueprints = [
 
 // The screen stands finished once the bar fills — drawings whole, nothing
 // moving — before anything starts to leave.
-const FULL_HOLD_MS = 2000;
+const FULL_HOLD_MS = 700;
 
 // The exit, after that. The drawings retreat the way they came while
-// everything but the logo softens out of focus; only then does the logo walk
-// to the middle, stand for a beat, and the frame dive into the "a" of .ai
-// until nothing but ink is left.
-const UNDRAW_MS = 1600;
+// everything but the logo softens out of focus; the logo walks to the middle;
+// the white ground fills with colour as the mark turns from black to white;
+// and then the frame dives into the eye of the "a" of "bizav" until the
+// letter has opened past every edge and only that colour is left.
+const UNDRAW_MS = 1200;
 const VANISH_MS = 600;
 const LIFT_AT = UNDRAW_MS;
 const LIFT_MS = 450;
-// Long enough to read as a stop rather than a bounce, and no longer.
-const CENTRE_HOLD_MS = 900;
-const ZOOM_AT = LIFT_AT + LIFT_MS + CENTRE_HOLD_MS;
+// The colour arrives the moment the logo lands, and the mark turns with it —
+// one move, not two.
+const COLOUR_AT = LIFT_AT + LIFT_MS;
+const COLOUR_MS = 600;
+// Long enough to be read as a frame of its own: white paper became a brand,
+// and that wants a beat before the camera moves again.
+const COLOUR_HOLD_MS = 500;
+const ZOOM_AT = COLOUR_AT + COLOUR_MS + COLOUR_HOLD_MS;
 const ZOOM_MS = 600;
-// The dive can only carry the ink so far; the rest of the black comes in
-// under cover of its second half, landing with it.
-const BLACK_AT = ZOOM_AT + ZOOM_MS / 2;
-const BLACK_MS = ZOOM_MS / 2;
-const BLACK_HOLD_MS = 200;
-const EXIT_MS = BLACK_AT + BLACK_MS + BLACK_HOLD_MS;
+// The dive lands on the ground showing through the letter, so the frame is
+// already flat brand colour when it gets there; this lays the same colour
+// over the top under cover of the second half of the zoom, which takes the
+// last of the ring off the screen cleanly.
+const INK_AT = ZOOM_AT + ZOOM_MS / 2;
+const INK_MS = ZOOM_MS / 2;
+const INK_HOLD_MS = 200;
+const EXIT_MS = INK_AT + INK_MS + INK_HOLD_MS;
 
-// The site is already painted black behind the loader by then; this is only
-// the last of the cover coming off.
+// The site is already painted behind the loader by then, and the loader is
+// one flat brand colour over it; this is only the cover coming off.
 const HANDOVER_MS = 400;
 
 // Read once, when the markup lands: every path carries its place in the
@@ -90,7 +98,14 @@ function sweepSteps(markup) {
 // which replaces every path with a new element and restarts every line's
 // animation, sixty times a second. Nothing here depends on the progress, so
 // the cheapest fix is for it never to re-render at all.
-const Blueprint = memo(function Blueprint({ name, url, markup, steps, at, drawMs }) {
+const Blueprint = memo(function Blueprint({
+  name,
+  url,
+  markup,
+  steps,
+  at,
+  drawMs,
+}) {
   const style = {
     "--steps": steps,
     // Spread whatever each window has left over those steps and that is the
@@ -257,10 +272,12 @@ function Loading({ onDone, onExited }) {
         "--vanish-ms": `${VANISH_MS}ms`,
         "--lift-at": `${LIFT_AT}ms`,
         "--lift-ms": `${LIFT_MS}ms`,
+        "--colour-at": `${COLOUR_AT}ms`,
+        "--colour-ms": `${COLOUR_MS}ms`,
         "--zoom-at": `${ZOOM_AT}ms`,
         "--zoom-ms": `${ZOOM_MS}ms`,
-        "--black-at": `${BLACK_AT}ms`,
-        "--black-ms": `${BLACK_MS}ms`,
+        "--ink-at": `${INK_AT}ms`,
+        "--ink-ms": `${INK_MS}ms`,
         "--dx": `${focus.dx}px`,
         "--dy": `${focus.dy}px`,
       }}

@@ -10,6 +10,11 @@
   inset: 0;
   z-index: 100;
   background-color: #ffffff;
+  /* The colour the ground turns once the drawing is gone — the same indigo
+     the strip under the hero carries, so the first colour of the site is a
+     colour the site already has. One token: the ground, the pane that lands
+     the dive and the keyframe between them must not be able to drift. */
+  --brand: #2b2b8b;
   /* The two aircraft are placed to run off the edges of the frame, and the
      logo is scaled a hundred-odd times over on the way out; the screen crops
      both, it does not grow to fit them. */
@@ -68,7 +73,9 @@
 
 .loading__blueprint .ink {
   animation: loading-line var(--line-ms) ease-out both;
-  animation-delay: calc(var(--draw-at, 0ms) + var(--i, 0) * var(--line-step, 0ms));
+  animation-delay: calc(
+    var(--draw-at, 0ms) + var(--i, 0) * var(--line-step, 0ms)
+  );
 }
 
 @keyframes loading-line {
@@ -279,12 +286,15 @@
 .loading[data-stage="exit"] .loading__lockup {
   position: relative;
   z-index: 1;
-  /* The left side of the bowl of the first "a", the one in "bizav": 107.7 of
-     172 across and 27.05 of 54 down in the asset's own coordinates. The ink
-     there is 4.5 units thick and runs 12 deep, which is what lets the dive
-     end on solid black. Scaling about that point keeps it nailed to the
-     middle of the frame while the ink swallows everything. */
-  transform-origin: 62.6% 50.1%;
+  /* The eye of the first "a", the one in "bizav" — the counter, not the ink
+     around it: a circle of radius 5.08 centred on 114.86, 27.07 of the
+     asset's own 172x54. Scaling about that point keeps it nailed to the
+     middle of the frame, so the ring opens past all four edges and what is
+     left standing is the ground the letter was cut out of. Aiming at the
+     stroke instead would end the dive on solid white, and the site behind
+     this is a night skyline — the frame has to arrive in the brand's colour,
+     not blow out to paper first. */
+  transform-origin: 66.78% 50.13%;
   animation:
     /* Waits out the un-drawing: the screen is empty but for the logo before
        it moves. */
@@ -293,7 +303,21 @@
     /* Forwards-only: a "both" fill would apply its start state during the
        delay and cancel the walk before it ran. */
     loading-zoom var(--zoom-ms) cubic-bezier(0.55, 0, 1, 0.45) var(--zoom-at)
-      forwards;
+      forwards,
+    /* Black to white, on the same clock as the ground it stands on. An
+       inversion rather than a second asset: the mark is one flat ink on
+       nothing, so inverting it turns that ink white and leaves the paper it
+       is cut out of alone. */
+    loading-flip var(--colour-ms) ease-in-out var(--colour-at) both;
+}
+
+@keyframes loading-flip {
+  from {
+    filter: invert(0);
+  }
+  to {
+    filter: invert(1);
+  }
 }
 
 @keyframes loading-center {
@@ -311,23 +335,47 @@
   }
   to {
     /* The second translate is a share of the logo's own width, which pulls
-       the focal point from where it sits in the wordmark to dead centre. */
-    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-12.6%, 0)
-      scale(140);
+       the focal point from where it sits in the wordmark to dead centre:
+       whatever the origin is past the halfway mark, given back. */
+    transform: translate(var(--dx, 0), var(--dy, 0)) translate(-16.78%, 0)
+      /* The counter is 5px across at rest. 200 opens it to some 1000px of
+         radius, which clears the corner of a 1440x810 frame — 826 away — with
+         room for the taller and wider ones. */
+      scale(200);
   }
 }
 
-/* Ink can only get so far on its own — the last of the black comes from here,
-   under cover of the zoom. */
+/* The ground turns. White paper for the drawing and the bar, then the brand's
+   own colour once the drawing is gone and only the mark is left standing on
+   it. */
+.loading[data-stage="exit"] {
+  animation: loading-colour var(--colour-ms) ease-in-out var(--colour-at) both;
+}
+
+@keyframes loading-colour {
+  from {
+    background-color: #ffffff;
+  }
+  to {
+    background-color: var(--brand);
+  }
+}
+
+/* The dive ends inside the letter, on the ground showing through it — so
+   what the frame is holding by then is already flat brand colour. This lays
+   the same colour over the top under cover of the zoom's second half, which
+   takes the ring's last edge and any seam at it off the screen a beat before
+   the site is handed the frame. It is the surface the site fades up through,
+   which is why it is the ground's colour and not the mark's. */
 .loading__ink {
   position: absolute;
   inset: 0;
   z-index: 2;
-  background-color: #000000;
-  animation: loading-black var(--black-ms) ease-in var(--black-at) both;
+  background-color: var(--brand);
+  animation: loading-ink var(--ink-ms) ease-in var(--ink-at) both;
 }
 
-@keyframes loading-black {
+@keyframes loading-ink {
   from {
     opacity: 0;
   }
@@ -363,9 +411,14 @@
     animation-name: loading-vanish;
   }
 
-  /* No dive: the screen simply goes to black under the standing logo. */
+  /* No dive: the ground simply fills under the standing logo. The turn from
+     black to white stays — this rule replaces the whole shorthand, and the
+     ground it is standing on goes to indigo either way, so dropping it would
+     leave a black mark on a dark blue screen. */
   .loading[data-stage="exit"] .loading__lockup {
-    animation: loading-center var(--lift-ms) ease-out var(--lift-at) both;
+    animation:
+      loading-center var(--lift-ms) ease-out var(--lift-at) both,
+      loading-flip var(--colour-ms) ease-in-out var(--colour-at) both;
   }
 
   @keyframes loading-fade {
